@@ -3,88 +3,23 @@
 #include "registers.h"
 #include "bus.h"
 #include <vector>
+#include <string>
+#include <functional>
 
 class Instr
 {
-protected:
-    Registers* registers;
-    Bus* bus;
-
+private:
+    Registers* registers_;
+    Bus* bus_;
+    std::function<void(Registers*, Bus*)> func_;
+public:
     Instr(Registers* registers, Bus* bus);
+    Instr(Registers* registers, Bus* bus, std::function<void(Registers*, Bus*)> func);
 
-    virtual bool execute() = 0;
+    bool execute();
 };
 
-class LoadInstr : public Instr {
-public:
-    LoadInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
 
-class StoreInstr : public Instr {
-public:
-    StoreInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
-
-class StackInstr : public Instr {
-public:
-    StackInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
-
-class IncrementInstr : public Instr {
-public:
-    IncrementInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
-
-class ShiftInstr : public Instr {
-public:
-    ShiftInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
-
-class LogicInstr : public Instr {
-public:
-    LogicInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
-
-class ArithmeticInstr : public Instr {
-public:
-    ArithmeticInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
-
-class BranchInstr : public Instr {
-public:
-    bool execute() override;
-};
-
-class ConditionInstr : public Instr {
-public:
-    ConditionInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
-
-class TransferInstr : public Instr {
-public:
-    TransferInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
-
-class BreakInstr : public Instr {
-public:
-    BreakInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
-
-class IllegalInstr : public Instr {
-public:
-    IllegalInstr(Registers* registers, Bus* bus);
-    bool execute() override;
-};
 
 class InstrGenerator {
 public:
@@ -92,8 +27,18 @@ public:
     static std::vector<std::vector<int>> instrTypeTable;
 
     static std::vector<std::vector<Instr*>> table;
-    static void init(Registers* registers, Bus* bus);
+    static void init(const std::string& pathName, Registers* registers, Bus* bus);
     static Instr* generateInstr(u8 high, u8 low);
+
+    static u8 accumulatorAccess(u16 PC);
+    static u8 ImpliedAccess(u16 PC);
+    static u8 absoluteAccess(u16 PC);
+    static u8 zeroPageAccess(u16 PC);
+    static u8 relativeAccess(u16 PC);
+    static u8 indirectAccess(u16 PC);
+    static u8 zeroPageIndexAccess(u16 PC);
+
+
 };
 
 #endif // INSTR_H
