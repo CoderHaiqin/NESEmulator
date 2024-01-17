@@ -10,14 +10,13 @@ private:
     Registers* registers_;
     Bus* bus_;
 
-    bool needFetch_;
-
-    Instr* instr;
+    int cycle_;
 
 public:
     CPU();
+    ~CPU();
 
-    void fetch();
+    Instr* fetch();
     void execute();
 
     void bindBus(Bus* bus);

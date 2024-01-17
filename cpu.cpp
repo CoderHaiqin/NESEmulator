@@ -2,26 +2,34 @@
 
 CPU::CPU()
 {
+    this->registers_ = new Registers();
 
+}
+
+CPU::~CPU() {
+    delete this->registers_;
 }
 
 void CPU::bindBus(Bus *bus) {
     bus_ = bus;
 }
 
-void CPU::fetch() {
+Instr* CPU::fetch() {
     u8 instr = bus_->read(registers_->PC);
+    registers_->PC++;
     u8 high = instr & (0xf0);
     u8 low = instr & (0x0f);
+
+    return InstrGenerator::generateInstr(this->registers_, this->bus_, high, low);
 }
 
 void CPU::execute() {
-    // 6502 CPU is different from modern CPU,
-    // it is possible to execute a single instr in multiple cycles
-    // so we need to do fetch and execute seperately
-    if(needFetch_) {
-        fetch();
-    }
 
+    if(cycle_ > 0) {
+        cycle_--;
+        return;
+    }
+    Instr* instr = fetch();
+    cycle_ = instr->execute();
 
 }

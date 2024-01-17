@@ -10,34 +10,56 @@ class Instr
 private:
     Registers* registers_;
     Bus* bus_;
-    std::function<void(Registers* registers, Bus* bus)> func_;
+    int access_;
+    std::function<int(Registers* registers, Bus* bus, int access)> func_;
 
 public:
-
     Instr(Registers* registers, Bus* bus);
-    Instr(Registers* registers, Bus* bus, std::function<void(Registers* registers, Bus* bus)> func);
+    Instr(Registers* registers, Bus* bus, std::function<int(Registers* registers, Bus* bus, int access)> func);
 
-    void execute();
+    int execute();
 
-    static void immediateAccess();
-    static void indirectAccess(Bus* bus);
-    static void absoluteAccess(Bus* bus);
-    static void zeropageAccess(Registers* registers, Bus* bus, char regis);
-    static void impliedAccess();
 };
-
-
 
 class InstrGenerator {
 public:
     static std::vector<std::vector<int>> cycleNumTable;
     static std::vector<std::vector<int>> instrTypeTable;
 
-    static std::vector<std::vector<Instr*>> table;
-    static void init(Registers* registers, Bus* bus);
-    static Instr* generateInstr(u8 high, u8 low);
-
-
+    static std::vector<std::vector<std::function<int(Registers* registers, Bus* bus)>>> table;
+    static void init();
+    static Instr* generateInstr(Registers* registers, Bus* bus, u8 high, u8 low);
 };
+
+namespace instr6502 {
+void BRK(Registers* registers, Bus* bus);
+
+void LD(Registers* registers, Bus* bus, char target, u8 value);
+
+void ST(Registers* registers, Bus* bus, char* target, u8 value);
+
+void STZ(Registers* registers, Bus* bus, char* target);
+}
+
+namespace access6502{
+std::function<u16(Registers* registers, Bus* bus, int& cycle)> getAccessFunc(int access);
+
+u16 impliedAccess(Registers* registers, Bus* bus, int& cycle);
+
+u16 immediateAccess(Registers* registers, Bus* bus, int& cycle);
+
+u16 zeropageAccess(Registers* registers, Bus* bus, int& cycle);
+
+u16 absoluteAccess(Registers* registers, Bus* bus, int& cycle);
+
+u16 indirectAccess(Registers* registers, Bus* bus, int& cycle);
+
+u16 indirectAccessX(Registers* registers, Bus* bus, int& cycle);
+
+u16 indirectAccessY(Registers* registers, Bus* bus, int& cycle);
+
+u16 relativeAccess(Registers* registers, Bus* bus, int& cycle);
+}
+
 
 #endif // INSTR_H
