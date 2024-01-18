@@ -24,6 +24,8 @@ public:
 
     void setP(int position, bool value);
     bool getP(int position);
+
+    void setNZ(u8 value);
 };
 
 #endif // REGISTERS_H
