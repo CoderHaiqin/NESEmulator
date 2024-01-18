@@ -63,6 +63,8 @@ int BRK(Registers* registers, Bus* bus, int access) {
     u16 high = bus->read(0xffff);
     registers->PC = (high << 8) | low;
 
+    registers->setP(Registers::POS_B, 1);
+
     return cycle;
 }
 
@@ -70,7 +72,11 @@ int LDA(Registers* registers, Bus* bus, int access) {
     auto accessAddr = access6502::getAccessFunc(access);
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
-    registers->A = bus->read(addr);
+
+    u8 value = bus->read(addr);
+
+    registers->A = bus->read(value);
+    registers->setNZ(value);
 
     return cycle;
 }
@@ -79,7 +85,11 @@ int LDX(Registers* registers, Bus* bus, int access) {
     auto accessAddr = access6502::getAccessFunc(access);
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
-    registers->X = bus->read(addr);
+
+    u8 value = bus->read(addr);
+
+    registers->X = value;
+    registers->setNZ(value);
 
     return cycle;
 }
@@ -88,7 +98,11 @@ int LDY(Registers* registers, Bus* bus, int access) {
     auto accessAddr = access6502::getAccessFunc(access);
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
-    registers->Y = bus->read(addr);
+
+    u8 value = bus->read(addr);
+
+    registers->Y = value;
+    registers->setNZ(value);
 
     return cycle;
 }
@@ -183,7 +197,11 @@ int PLA(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     addr = registers->SP | (0x0100);
-    registers->A = bus->read(addr);
+
+    u8 value = bus->read(addr);
+    registers->setNZ(value);
+
+    registers->A = value;
     registers->SP += 8;
 
     return cycle;
@@ -195,7 +213,11 @@ int PLX(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     addr = registers->SP | (0x0100);
-    registers->X = bus->read(addr);
+
+    u8 value = bus->read(addr);
+    registers->setNZ(value);
+
+    registers->X = value;
     registers->SP += 8;
 
     return cycle;
@@ -207,7 +229,11 @@ int PLY(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     addr = registers->SP | (0x0100);
-    registers->Y = bus->read(addr);
+
+    u8 value = bus->read(addr);
+    registers->setNZ(value);
+
+    registers->Y = value;
     registers->SP += 8;
 
     return cycle;
@@ -228,6 +254,8 @@ int PLP(Registers* registers, Bus* bus, int access) {
 int TSX(Registers* registers, Bus* bus, int access) {
     registers->X = registers->SP;
 
+    registers->setNZ(registers->X);
+
     return 0;
 }
 
@@ -240,11 +268,15 @@ int TXS(Registers* registers, Bus* bus, int access) {
 int INA(Registers* registers, Bus* bus, int access) {
     registers->A++;
 
+    registers->setNZ(registers->A);
+
     return 0;
 }
 
 int INX(Registers* registers, Bus* bus, int access) {
     registers->X++;
+
+    registers->setNZ(registers->X);
 
     return 0;
 }
@@ -252,11 +284,15 @@ int INX(Registers* registers, Bus* bus, int access) {
 int INY(Registers* registers, Bus* bus, int access) {
     registers->Y++;
 
+    registers->setNZ(registers->Y);
+
     return 0;
 }
 
 int DEA(Registers* registers, Bus* bus, int access) {
     registers->A--;
+
+    registers->setNZ(registers->A);
 
     return 0;
 }
@@ -264,11 +300,15 @@ int DEA(Registers* registers, Bus* bus, int access) {
 int DEX(Registers* registers, Bus* bus, int access) {
     registers->X--;
 
+    registers->setNZ(registers->X);
+
     return 0;
 }
 
 int DEY(Registers* registers, Bus* bus, int access) {
     registers->Y--;
+
+    registers->setNZ(registers->Y);
 
     return 0;
 }
@@ -281,6 +321,9 @@ int INC(Registers* registers, Bus* bus, int access) {
 
     u8 value = bus->read(addr);
     value++;
+
+    registers->setNZ(value);
+
     bus->write(addr, value);
 
     return cycle;
@@ -293,6 +336,9 @@ int DEC(Registers* registers, Bus* bus, int access) {
 
     u8 value = bus->read(addr);
     value--;
+
+    registers->setNZ(value);
+
     bus->write(addr, value);
 
     return cycle;
@@ -303,6 +349,9 @@ int ASL(Registers* registers, Bus* bus, int access) {
     u8 high = value & (0x80);
 
     value = value << 1;
+
+    registers->setNZ(value);
+
     registers->A = value;
 
     return 0;
@@ -313,6 +362,9 @@ int LSR(Registers* registers, Bus* bus, int access) {
     u8 low = value & (0x01);
 
     value = value >> 1;
+
+    registers->setNZ(value);
+
     registers->A = value;
 
     return 0;
@@ -324,6 +376,9 @@ int ROL(Registers* registers, Bus* bus, int access) {
         u8 C = registers->P & (0x01);
         value = value << 1;
         value = value | C;
+
+        registers->setNZ(value);
+
         registers->A = value;
 
         return 0;
@@ -337,6 +392,9 @@ int ROL(Registers* registers, Bus* bus, int access) {
     u8 C = registers->P & (0x01);
     value = value << 1;
     value = value | C;
+
+    registers->setNZ(value);
+
     bus->write(addr, value);
 
     return cycle;
@@ -348,6 +406,9 @@ int ROR(Registers* registers, Bus* bus, int access) {
         u8 C = (registers->P & (0x01)) << 7;
         value = value >> 1;
         value = value | C;
+
+        registers->setNZ(value);
+
         registers->A = value;
 
         return 0;
@@ -361,6 +422,9 @@ int ROR(Registers* registers, Bus* bus, int access) {
     u8 C = (registers->P & (0x01)) << 7;
     value = value >> 1;
     value = value | C;
+
+    registers->setNZ(value);
+
     bus->write(addr, value);
 
     return cycle;
@@ -374,6 +438,8 @@ int AND(Registers* registers, Bus* bus, int access) {
     u8 value = bus->read(addr);
     registers->A = registers->A & value;
 
+    registers->setNZ(registers->A);
+
     return cycle;
 }
 
@@ -385,6 +451,8 @@ int ORA(Registers* registers, Bus* bus, int access) {
     u8 value = bus->read(addr);
     registers->A = registers->A | value;
 
+    registers->setNZ(registers->A);
+
     return cycle;
 }
 
@@ -395,6 +463,8 @@ int EOR(Registers* registers, Bus* bus, int access) {
 
     u8 value = bus->read(addr);
     registers->A = registers->A ^ value;
+
+    registers->setNZ(registers->A);
 
     return cycle;
 }
@@ -486,7 +556,13 @@ int ADC(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     u8 value = bus->read(addr);
+
+    u8 prevA = registers->A;
+    registers->setP(Registers::POS_C, registers->carry(prevA, value, registers->getP(Registers::POS_C)));
     registers->A = registers->A + value + registers->getP(Registers::POS_C);
+
+    registers->setNZ(registers->A);
+    registers->setP(Registers::POS_V, (prevA & 0x8000) != (registers->A & 0x8000));
 
     return cycle;
 }
@@ -497,8 +573,12 @@ int SBC(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     u8 value = bus->read(addr);
-
+    u8 prevA = registers->A;
+    registers->setP(Registers::POS_C, registers->carry(prevA, -value, -(~(u8)registers->getP(Registers::POS_C))));
     registers->A = registers->A - value - (~(u8)registers->getP(Registers::POS_C));
+
+    registers->setNZ(registers->A);
+    registers->setP(Registers::POS_V, (prevA & 0x8000) != (registers->A & 0x8000));
 
     return cycle;
 }
@@ -676,21 +756,26 @@ int SEI(Registers* registers, Bus* bus, int access) {
 
 int TAX(Registers* registers, Bus* bus, int access) {
     registers->X = registers->A;
+
+    registers->setNZ(registers->A);
     return 0;
 }
 
 int TAY(Registers* registers, Bus* bus, int access) {
     registers->Y = registers->A;
+    registers->setNZ(registers->A);
     return 0;
 }
 
 int TXA(Registers* registers, Bus* bus, int access) {
     registers->A = registers->X;
+    registers->setNZ(registers->A);
     return 0;
 }
 
 int TYA(Registers* registers, Bus* bus, int access) {
     registers->A = registers->Y;
+    registers->setNZ(registers->A);
     return 0;
 }
 

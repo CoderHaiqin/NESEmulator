@@ -26,6 +26,8 @@ public:
     bool getP(int position);
 
     void setNZ(u8 value);
+    bool carry(u8 a, u8 b);
+    bool carry(u8 a, u8 b, u8 c);
 };
 
 #endif // REGISTERS_H
