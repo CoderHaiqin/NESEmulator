@@ -821,6 +821,10 @@ u16 zeropageAccess(Registers* registers, Bus* bus, char regis, int& cycle) {
     return 0x00ff & offset;
 }
 
+u16 zeropageAccessNone(Registers* registers, Bus* bus, int& cycle) {
+    return zeropageAccess(registers, bus, '0', cycle);
+}
+
 u16 zeropageAccessX(Registers* registers, Bus* bus, int& cycle) {
     return zeropageAccess(registers, bus, 'X', cycle);
 }
@@ -849,6 +853,10 @@ u16 absoluteAccess(Registers* registers, Bus* bus, char regis, int& cycle) {
     cycle = ((targetAddr & 0xff00) >> 8) != high;
 
     return targetAddr;
+}
+
+u16 absoluteAccessNone(Registers* registers, Bus* bus, int& cycle) {
+    return absoluteAccess(registers, bus, '0', cycle);
 }
 
 u16 absoluteAccessX(Registers* registers, Bus* bus, int& cycle) {
@@ -918,10 +926,39 @@ u16 relativeAccess(Registers* registers, Bus* bus, int& cycle) {
     return 0;
 }
 
+u16 indirectAbsoluteAccess(Registers* registers, Bus* bus, int& cycle) {
+    u16 addr1 = registers->PC;
+    registers->PC++;
+    u8 low = bus->read(addr1);
+
+    u16 addr2 = registers->PC;
+    registers->PC++;
+    u8 high = bus->read(addr2);
+
+    u16 targetAddr = (((u16)(high)) << 8) & low;
+    return bus->read(targetAddr);
+}
+
 std::function<u16(Registers* registers, Bus* bus, int& cycle)> getAccessFunc(int access) {
+    /*
+    *   0 imp
+    *   1 imm
+    *   2 z
+    *   3 zx
+    *   4 zy
+    *   5 a
+    *   6 ax
+    *   7 ay
+    *   8 i
+    *   9 ix
+    *   10 iy
+    *   11 r
+    *   12 iab
+    */
     static std::vector<std::function<u16(Registers* registers, Bus* bus, int& cycle)>> table = {
-        impliedAccess, immediateAccess, zeropageAccess, absoluteAccess, indirectAccess,
-        indirectAccessX, indirectAccessY, relativeAccess
+        impliedAccess, immediateAccess, zeropageAccessNone, zeropageAccessX, zeropageAccessY,
+        absoluteAccessX, absoluteAccessY,
+        indirectAccess, indirectAccessX, indirectAccessY, relativeAccess
     };
 
     if(access < 0 || access >= table.size()) {
