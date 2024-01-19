@@ -2,49 +2,134 @@
 #include "instr.h"
 #include "constant.h"
 #include <iostream>
+#include <sstream>
+#include <fstream>
 
-Instr::Instr(Registers* registers, Bus* bus) : registers_(registers), bus_(bus)
-{
-    func_ = [](Registers* registers, Bus* bus, int access) {
-        std::cout << "invalid instrction" << std::endl;
-        return 0;
-    };
+Instr::Instr(int access, int cycleNum, std::function<int(Registers* registers, Bus* bus, int access)> func)
+    : access_(access), cycleNum_(cycleNum), func_(func) {
 }
 
-Instr::Instr(Registers* registers, Bus* bus, std::function<int(Registers* registers, Bus* bus, int access)> func) : registers_(registers), bus_(bus), func_(func) {
-
-}
-
-int Instr::execute() {
-    return func_(this->registers_, this->bus_, this->access_);
+int Instr::execute(Registers* registers, Bus* bus) {
+    return cycleNum_ + func_(registers, bus, this->access_);
 }
 
 void InstrGenerator::init() {
-    instrTypeTable.resize(Constant::instrTableSize);
+    instrNameTable["BRK"] = instr6502::BRK;
+    instrNameTable["LDA"] = instr6502::LDA;
+    instrNameTable["LDX"] = instr6502::LDX;
+    instrNameTable["LDY"] = instr6502::LDY;
+    instrNameTable["STA"] = instr6502::STA;
+    instrNameTable["STX"] = instr6502::STX;
+    instrNameTable["STY"] = instr6502::STY;
+    instrNameTable["STZ"] = instr6502::STZ;
+    instrNameTable["PHA"] = instr6502::PHA;
+    instrNameTable["PHX"] = instr6502::PHX;
+    instrNameTable["PHY"] = instr6502::PHY;
+    instrNameTable["PHP"] = instr6502::PHP;
+    instrNameTable["PLA"] = instr6502::PLA;
+    instrNameTable["PLX"] = instr6502::PLX;
+    instrNameTable["PLY"] = instr6502::PLY;
+    instrNameTable["PLP"] = instr6502::PLP;
+    instrNameTable["TSX"] = instr6502::TSX;
+    instrNameTable["TXS"] = instr6502::TXS;
+    instrNameTable["INA"] = instr6502::INA;
+    instrNameTable["INX"] = instr6502::INX;
+    instrNameTable["INY"] = instr6502::INY;
+    instrNameTable["DEA"] = instr6502::DEA;
+    instrNameTable["DEX"] = instr6502::DEX;
+    instrNameTable["DEY"] = instr6502::DEY;
+    instrNameTable["INC"] = instr6502::INC;
+    instrNameTable["DEC"] = instr6502::DEC;
+    instrNameTable["ASL"] = instr6502::ASL;
+    instrNameTable["LSR"] = instr6502::LSR;
+    instrNameTable["ROL"] = instr6502::ROL;
+    instrNameTable["ROR"] = instr6502::ROR;
+    instrNameTable["AND"] = instr6502::AND;
+    instrNameTable["ORA"] = instr6502::ORA;
+    instrNameTable["EOR"] = instr6502::EOR;
+    instrNameTable["BIT"] = instr6502::BIT;
+    instrNameTable["CMP"] = instr6502::CMP;
+    instrNameTable["CPX"] = instr6502::CPX;
+    instrNameTable["CPY"] = instr6502::CPY;
+    instrNameTable["ADC"] = instr6502::ADC;
+    instrNameTable["SBC"] = instr6502::SBC;
+    instrNameTable["JMP"] = instr6502::JMP;
+    instrNameTable["JSR"] = instr6502::JSR;
+    instrNameTable["RTX"] = instr6502::RTX;
+    instrNameTable["RTI"] = instr6502::RTI;
+    instrNameTable["BEQ"] = instr6502::BEQ;
+    instrNameTable["BNE"] = instr6502::BNE;
+    instrNameTable["BCS"] = instr6502::BCS;
+    instrNameTable["BCC"] = instr6502::BCC;
+    instrNameTable["BMI"] = instr6502::BMI;
+    instrNameTable["BPL"] = instr6502::BPL;
+    instrNameTable["BVS"] = instr6502::BVS;
+    instrNameTable["BVC"] = instr6502::BVC;
+    instrNameTable["CLC"] = instr6502::CLC;
+    instrNameTable["CLD"] = instr6502::CLD;
+    instrNameTable["CLI"] = instr6502::CLI;
+    instrNameTable["CLV"] = instr6502::CLV;
+    instrNameTable["SEC"] = instr6502::SEC;
+    instrNameTable["SED"] = instr6502::SED;
+    instrNameTable["SEI"] = instr6502::SEI;
+    instrNameTable["TAX"] = instr6502::TAX;
+    instrNameTable["TAY"] = instr6502::TAY;
+    instrNameTable["TXA"] = instr6502::TXA;
+    instrNameTable["TYA"] = instr6502::TYA;
+    instrNameTable["NOP"] = instr6502::NOP;
+
+    std::ifstream f("./instr.txt");
+    if(!f.is_open()) {
+        std::cout << "fail to open a file" << std::endl;
+        return;
+    }
+
+    std::string buf;
+    int count = 0;
+    std::string t[3 * Constant::instrTableSize][Constant::instrTableSize];
+    while(std::getline(f, buf)) {
+        if(buf.empty()) {
+            continue;
+        }
+        std::stringstream ss(buf);
+        for(int i = 0; i < Constant::instrTableSize; i++) {
+            std::string tmp;
+            ss >> tmp;
+            t[count][i] = tmp;
+        }
+        count++;
+    }
+
+    accessTypeTable.resize(Constant::instrTableSize);
     cycleNumTable.resize(Constant::instrTableSize);
-    table.resize(Constant::instrTableSize);
+    funcTable.resize(Constant::instrTableSize);
+    instrTable.resize(Constant::instrTableSize);
     for(int i = 0; i < Constant::instrTableSize; i++) {
         cycleNumTable[i].resize(Constant::instrTableSize);
-        instrTypeTable[i].resize(Constant::instrTableSize);
-        table[i].resize(Constant::instrTableSize);
+        accessTypeTable[i].resize(Constant::instrTableSize);
+        funcTable.resize(Constant::instrTableSize);
+        instrTable[i].resize(Constant::instrTableSize);
     }
 
 
     for(int i = 0; i < Constant::instrTableSize; i++) {
         for(int j = 0; j < Constant::instrTableSize; i++) {
-            
+            accessTypeTable[i][j] = atoi(t[i][j].c_str());
+            cycleNumTable[i][j] = atoi(t[i + Constant::instrTableSize][j].c_str());
+            funcTable[i][j] = instrNameTable[t[i + 2 * Constant::instrTableSize][j]];
         }
     }
 
     for(int i = 0; i < Constant::instrTableSize; i++) {
-        for(int j = 0; j < Constant::instrTableSize; j++) {
-            table[i][j] = [](Registers* registers, Bus* bus) -> int {
-
-            };
+        for(int j = 0; j < Constant::instrTableSize; i++) {
+            instrTable[i][j] = new Instr(accessTypeTable[i][j], cycleNumTable[i][j], funcTable[i][j]);
         }
     }
 }
 
+Instr* InstrGenerator::generateInstr(u8 high, u8 low) {
+    return instrTable[high][low];
+}
 
 namespace instr6502 {
 int BRK(Registers* registers, Bus* bus, int access) {
