@@ -24,7 +24,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     memory.cpp \
-    registers.cpp
+    registers.cpp \
+    rom.cpp
 
 HEADERS += \
     access.h \
@@ -36,6 +37,7 @@ HEADERS += \
     mainwindow.h \
     memory.h \
     registers.h \
+    rom.h \
     type.h
 
 FORMS += \
