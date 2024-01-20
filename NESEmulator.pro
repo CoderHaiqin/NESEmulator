@@ -23,7 +23,7 @@ SOURCES += \
     machine.cpp \
     main.cpp \
     mainwindow.cpp \
-    memory.cpp \
+    ram.cpp \
     registers.cpp \
     rom.cpp
 
@@ -35,7 +35,7 @@ HEADERS += \
     instr.h \
     machine.h \
     mainwindow.h \
-    memory.h \
+    ram.h \
     registers.h \
     rom.h \
     type.h

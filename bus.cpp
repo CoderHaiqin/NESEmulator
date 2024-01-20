@@ -1,16 +1,15 @@
 #include "bus.h"
 
-Bus::Bus() : memory(nullptr) {}
+Bus::Bus() : ram_(nullptr) {}
 
-void Bus::bindMemory(Memory *memory) {
-    this->memory = memory;
+void Bus::bindRAM(RAM *ram) {
+    ram_ = ram;
 }
 
-
 uint8_t Bus::read(u16 address) {
-    return this->memory->read(address);
+    return ram_->read(address);
 }
 
 void Bus::write(u16 address, u8 value) {
-    this->memory->write(address, value);
+    ram_->write(address, value);
 }

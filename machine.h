@@ -8,11 +8,13 @@ class Machine
 private:
     CPU* cpu;
     Bus* bus;
-    Memory* memory;
+    RAM* ram;
 
 public:
     Machine();
     ~Machine();
+
+
 };
 
 #endif // MACHINE_H

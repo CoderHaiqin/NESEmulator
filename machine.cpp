@@ -4,14 +4,14 @@ Machine::Machine()
 {
     this->cpu = new CPU;
     this->bus = new Bus;
-    this->memory = new Memory;
+    this->ram = new RAM;
 
     this->cpu->bindBus(bus);
-    this->bus->bindMemory(memory);
+    this->bus->bindRAM(ram);
 }
 
 Machine::~Machine() {
     delete cpu;
     delete bus;
-    delete memory;
+    delete ram;
 }
