@@ -13,7 +13,11 @@ int Instr::execute(Registers* registers, Bus* bus) {
     return cycleNum_ + func_(registers, bus, this->access_);
 }
 
-void InstrGenerator::init() {
+InstrGenerator::InstrGenerator() {
+
+}
+
+InstrGenerator::InstrGenerator(const std::string& path) {
     instrNameTable["BRK"] = instr6502::BRK;
     instrNameTable["LDA"] = instr6502::LDA;
     instrNameTable["LDX"] = instr6502::LDX;
@@ -78,9 +82,9 @@ void InstrGenerator::init() {
     instrNameTable["TYA"] = instr6502::TYA;
     instrNameTable["NOP"] = instr6502::NOP;
 
-    std::ifstream f("./instr.txt");
+    std::ifstream f(path);
     if(!f.is_open()) {
-        std::cout << "fail to open a file" << std::endl;
+        std::cout << "fail to open file" << std::endl;
         return;
     }
 
@@ -128,7 +132,9 @@ void InstrGenerator::init() {
 }
 
 Instr* InstrGenerator::generateInstr(u8 high, u8 low) {
-    return instrTable[high][low];
+    static InstrGenerator g("./instr.txt");
+
+    return g.instrTable[high][low];
 }
 
 namespace instr6502 {

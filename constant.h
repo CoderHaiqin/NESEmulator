@@ -7,7 +7,7 @@ public:
     static const int memorySize = 0xffff;
     static const int headerLength = 0xf;
 
-    static const int RAMSize = 0x2000;
+    static const int RAMSize = 0x7ff;
 };
 
 #endif // CONSTANT_H

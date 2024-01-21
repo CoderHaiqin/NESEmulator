@@ -8,6 +8,7 @@ class Registers
 public:
     static const int POS_N = 7;
     static const int POS_V = 6;
+    static const int POS_ONE = 5;
     static const int POS_B = 4;
     static const int POS_D = 3;
     static const int POS_I = 2;

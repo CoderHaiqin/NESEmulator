@@ -8,7 +8,7 @@ class Machine
 private:
     CPU* cpu;
     Bus* bus;
-    RAM* ram;
+    MemoryBlock* ram;
 
 public:
     Machine();

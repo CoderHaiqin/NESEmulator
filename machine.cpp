@@ -4,7 +4,7 @@ Machine::Machine()
 {
     this->cpu = new CPU;
     this->bus = new Bus;
-    this->ram = new RAM;
+    this->ram = new MemoryBlock(0x800);
 
     this->cpu->bindBus(bus);
     this->bus->bindRAM(ram);

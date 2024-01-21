@@ -9,6 +9,21 @@ CPU::~CPU() {
     delete this->registers_;
 }
 
+void CPU::reset() {
+    registers_->A = 0;
+    registers_->X = 0;
+    registers_->Y = 0;
+
+    registers_->SP = 0xfd;
+    registers_->P = 0;
+    registers_->setP(Registers::POS_I, 1);
+    registers_->setP(Registers::POS_ONE, 1);
+
+    u8 low = bus_->read(0xFFFC);
+    u8 high = bus_->read(0xFFFD);
+    registers_->PC = u16(high << 8) + low;
+}
+
 void CPU::bindBus(Bus *bus) {
     bus_ = bus;
 }

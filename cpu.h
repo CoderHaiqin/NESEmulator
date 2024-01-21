@@ -16,6 +16,8 @@ public:
     CPU();
     ~CPU();
 
+    void reset();
+
     Instr* fetch();
     void execute();
 

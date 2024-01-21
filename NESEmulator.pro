@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    memoryblock.cpp \
     access.cpp \
     bus.cpp \
     cpu.cpp \
@@ -23,11 +24,11 @@ SOURCES += \
     machine.cpp \
     main.cpp \
     mainwindow.cpp \
-    ram.cpp \
     registers.cpp \
     rom.cpp
 
 HEADERS += \
+    memoryblock.h \
     access.h \
     bus.h \
     constant.h \
@@ -35,7 +36,6 @@ HEADERS += \
     instr.h \
     machine.h \
     mainwindow.h \
-    ram.h \
     registers.h \
     rom.h \
     type.h

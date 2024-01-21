@@ -23,16 +23,17 @@ public:
 
 class InstrGenerator {
 public:
-    static std::map<std::string, std::function<int(Registers* registers, Bus* bus, int access)>> instrNameTable;
+    InstrGenerator();
+    InstrGenerator(const std::string& path);
+    std::map<std::string, std::function<int(Registers* registers, Bus* bus, int access)>> instrNameTable;
 
-    static std::vector<std::vector<int>> cycleNumTable;
-    static std::vector<std::vector<int>> accessTypeTable;
+    std::vector<std::vector<int>> cycleNumTable;
+    std::vector<std::vector<int>> accessTypeTable;
 
-    static std::vector<std::vector<std::function<int(Registers* registers, Bus* bus, int access)>>> funcTable;
+    std::vector<std::vector<std::function<int(Registers* registers, Bus* bus, int access)>>> funcTable;
 
-    static std::vector<std::vector<Instr*>> instrTable;
+    std::vector<std::vector<Instr*>> instrTable;
 
-    static void init();
     static Instr* generateInstr(u8 high, u8 low);
 };
 
