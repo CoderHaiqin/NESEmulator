@@ -111,21 +111,22 @@ InstrGenerator::InstrGenerator(const std::string& path) {
     for(int i = 0; i < Constant::instrTableSize; i++) {
         cycleNumTable[i].resize(Constant::instrTableSize);
         accessTypeTable[i].resize(Constant::instrTableSize);
-        funcTable.resize(Constant::instrTableSize);
+        funcTable[i].resize(Constant::instrTableSize);
         instrTable[i].resize(Constant::instrTableSize);
     }
 
 
     for(int i = 0; i < Constant::instrTableSize; i++) {
-        for(int j = 0; j < Constant::instrTableSize; i++) {
+        for(int j = 0; j < Constant::instrTableSize; j++) {
             accessTypeTable[i][j] = atoi(t[i][j].c_str());
             cycleNumTable[i][j] = atoi(t[i + Constant::instrTableSize][j].c_str());
+
             funcTable[i][j] = instrNameTable[t[i + 2 * Constant::instrTableSize][j]];
         }
     }
 
     for(int i = 0; i < Constant::instrTableSize; i++) {
-        for(int j = 0; j < Constant::instrTableSize; i++) {
+        for(int j = 0; j < Constant::instrTableSize; j++) {
             instrTable[i][j] = new Instr(accessTypeTable[i][j], cycleNumTable[i][j], funcTable[i][j]);
         }
     }
@@ -987,7 +988,7 @@ u16 indirectAccessX(Registers* registers, Bus* bus, int& cycle) {
     u16 targetAddr = (((u16)(high)) << 8) & low;
 
     cycle = 0;
-    return bus->read(targetAddr);
+    return targetAddr;
 }
 
 u16 indirectAccessY(Registers* registers, Bus* bus, int& cycle) {
@@ -1001,7 +1002,7 @@ u16 indirectAccessY(Registers* registers, Bus* bus, int& cycle) {
     targetAddr += registers->Y;
     cycle = ((targetAddr & 0xff00) >> 8) != high;
 
-    return bus->read(targetAddr);
+    return targetAddr;
 }
 
 u16 relativeAccess(Registers* registers, Bus* bus, int& cycle) {
@@ -1048,8 +1049,8 @@ std::function<u16(Registers* registers, Bus* bus, int& cycle)> getAccessFunc(int
     */
     static std::vector<std::function<u16(Registers* registers, Bus* bus, int& cycle)>> table = {
         impliedAccess, immediateAccess, zeropageAccessNone, zeropageAccessX, zeropageAccessY,
-        absoluteAccessX, absoluteAccessY,
-        indirectAccess, indirectAccessX, indirectAccessY, relativeAccess
+        absoluteAccessNone, absoluteAccessX, absoluteAccessY,
+        indirectAccess, indirectAccessX, indirectAccessY, relativeAccess, indirectAbsoluteAccess
     };
 
     if(access < 0 || access >= table.size()) {

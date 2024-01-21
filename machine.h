@@ -10,11 +10,15 @@ private:
     Bus* bus;
     MemoryBlock* ram;
 
+    MemoryBlock* prg;
+
 public:
     Machine();
     ~Machine();
 
-
+    void reset();
+    void load(const std::string& path);
+    void update();
 };
 
 #endif // MACHINE_H

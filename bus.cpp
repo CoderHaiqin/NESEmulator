@@ -14,10 +14,10 @@ void Bus::bindPRG(MemoryBlock *prg) {
 uint8_t Bus::read(u16 address) {
     u16 key = address >> 13;
     if(key == 0) {
-        ram_->read(address & 0x7ff);
+        return ram_->read(address & 0x7ff);
     }
     else {
-        prg_->read(address % prg_->length_);
+        return prg_->read(address % prg_->length_);
     }
 
     return 0;

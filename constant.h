@@ -3,11 +3,11 @@
 
 class Constant {
 public:
-    static const int instrTableSize = 0xf;
-    static const int memorySize = 0xffff;
-    static const int headerLength = 0xf;
+    static const int instrTableSize = 0x10;
+    static const int memorySize = 0x10000;
+    static const int headerLength = 0x10;
 
-    static const int RAMSize = 0x7ff;
+    static const int RAMSize = 0x800;
 };
 
 #endif // CONSTANT_H

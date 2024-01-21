@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "machine.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,5 +18,11 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    Machine machine;
+    QTimer* timer;
+
+private slots:
+    void update();
 };
 #endif // MAINWINDOW_H

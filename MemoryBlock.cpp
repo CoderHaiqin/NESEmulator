@@ -1,7 +1,8 @@
 #include "MemoryBlock.h"
 
-MemoryBlock::MemoryBlock(u16 addr) {
-    m_ = new u8[addr];
+MemoryBlock::MemoryBlock(u16 length) {
+    m_ = new u8[length];
+    length_ = length;
 }
 
 MemoryBlock::~MemoryBlock() {

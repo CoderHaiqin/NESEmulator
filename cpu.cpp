@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include <iostream>
 
 CPU::CPU()
 {
@@ -31,7 +32,7 @@ void CPU::bindBus(Bus *bus) {
 Instr* CPU::fetch() {
     u8 instr = bus_->read(registers_->PC);
     registers_->PC++;
-    u8 high = (instr & (0xf0)) >> 8;
+    u8 high = (instr & (0xf0)) >> 4;
     u8 low = instr & (0x0f);
 
     return InstrGenerator::generateInstr(high, low);
@@ -43,6 +44,7 @@ void CPU::execute() {
         cycle_--;
         return;
     }
+    std::cout << this->registers_->PC << std::endl;
     Instr* instr = fetch();
     cycle_ = instr->execute(registers_, bus_);
 

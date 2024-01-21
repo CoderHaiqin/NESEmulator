@@ -2,6 +2,7 @@
 #include <constant.h>
 #include <ios>
 #include <fstream>
+#include <iostream>
 
 ROM::ROM() {}
 
@@ -12,12 +13,8 @@ bool ROM::load(const std::string& path) {
     if(!file) {
         return false;
     }
-    file.seekg(0, std::ios::end);
-    unsigned long len = file.tellg();
-    char* buffer = new char[len];
-    file.seekg(0, std::ios::beg);
-    file.read(buffer, len);
-
+    std::vector<u8> buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    std::cout << (int)buffer[0x400c] << std::endl;
     file.close();
 
     int p = 0;
@@ -58,11 +55,11 @@ bool ROM::hasTrainerArea() {
     return header_[6] & 0x04;
 }
 
-u32 ROM::getPRGSize() {
+u16 ROM::getPRGSize() {
     return header_[4] * 1024 * 16;
 }
 
-u32 ROM::getCHRSize() {
+u16 ROM::getCHRSize() {
     return header_[5] * 1024 * 8;
 }
 
