@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     timer = new QTimer(this);
-    timer->start(1);
+    timer->setTimerType(Qt::PreciseTimer);
+    timer->start(50);
     QObject::connect(timer, &QTimer::timeout, this, &MainWindow::update);
 
     machine.load("./nestest.nes");
@@ -17,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::update() {
     this->machine.update();
+
+
 }
 
 MainWindow::~MainWindow()

@@ -17,25 +17,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     memoryblock.cpp \
-    access.cpp \
     bus.cpp \
     cpu.cpp \
     instr.cpp \
     machine.cpp \
     main.cpp \
     mainwindow.cpp \
+    ppu.cpp \
+    ppubus.cpp \
     registers.cpp \
     rom.cpp
 
 HEADERS += \
     memoryblock.h \
-    access.h \
     bus.h \
     constant.h \
     cpu.h \
     instr.h \
     machine.h \
     mainwindow.h \
+    ppu.h \
+    ppubus.h \
     registers.h \
     rom.h \
     type.h

@@ -8,9 +8,13 @@ Machine::Machine()
     this->cpu = new CPU;
     this->bus = new Bus;
     this->ram = new MemoryBlock(0x800);
+    this->ppu = new PPU();
+    this->ppuBus = new PPUBus();
 
     this->cpu->bindBus(bus);
     this->bus->bindRAM(ram);
+    this->ppu->bindPPUBus(ppuBus);
+
 }
 
 Machine::~Machine() {
@@ -32,6 +36,7 @@ void Machine::load(const std::string& path) {
         return;
     }
 
+    // load PRG
     u16 prgSize = rom.getPRGSize();
     this->prg = new MemoryBlock(prgSize);
     for(int i = 0; i < prgSize; i++) {
@@ -39,6 +44,10 @@ void Machine::load(const std::string& path) {
     }
 
     bus->bindPRG(prg);
+
+    // load CHR
+    u16 chrSize = rom.getCHRSize();
+
 
     reset();
 }

@@ -44,7 +44,7 @@ void CPU::execute() {
         cycle_--;
         return;
     }
-    std::cout << this->registers_->PC << std::endl;
+    // std::cout << this->registers_->PC << std::endl;
     Instr* instr = fetch();
     cycle_ = instr->execute(registers_, bus_);
 

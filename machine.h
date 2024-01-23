@@ -2,6 +2,7 @@
 #define MACHINE_H
 
 #include "cpu.h"
+#include "ppu.h"
 
 class Machine
 {
@@ -9,8 +10,9 @@ private:
     CPU* cpu;
     Bus* bus;
     MemoryBlock* ram;
-
     MemoryBlock* prg;
+    PPU* ppu;
+    PPUBus* ppuBus;
 
 public:
     Machine();

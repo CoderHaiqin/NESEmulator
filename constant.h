@@ -8,6 +8,8 @@ public:
     static const int headerLength = 0x10;
 
     static const int RAMSize = 0x800;
+
+    static const int PRGPageSize = 16 * 1024;
 };
 
 #endif // CONSTANT_H
