@@ -99,7 +99,7 @@ void PPU::writeScroll(u8 value) {
 }
 
 void PPU::writeAddr(u8 value) {
-    if(w_register_ == 0) {
+    if(w_register_ == 1) {
         addr_ = addr_ & 0x3f00;
         addr_ = addr_ | value;
     } else {
@@ -116,5 +116,89 @@ void PPU::writeData(u8 value) {
         addr_ += 32;
     } else {
         addr_ += 1;
+    }
+}
+
+void PPU::reset() {
+
+}
+
+void PPU::update() {
+
+}
+
+void PPU::startVBlank() {
+    this->status_ = this->status_ | 0x80;
+}
+
+void PPU::endVBlank() {
+    this->status_ = this->status_ & 0x7f;
+}
+
+void PPU::get() {
+    // find the attribute table for the 4x4 group
+
+    for(int i = 0; i < 30; i++) {
+        for(int j = 0; j < 32; j++) {
+            // 1. handle attribution table
+            int indexInAttrTable = 960 + (i / 4 * 8 + j / 4);
+            u8 attr = ppuBus_->read(indexInAttrTable + 0x2000);
+            u8 offset = 0;
+            if(i % 4 / 2 == 0 && j % 4 / 2 == 0) {
+                offset = 0;
+            } else if (i % 4 / 2 == 0 && j % 4 / 2 == 1) {
+                offset = 2;
+            } else if (i % 4 / 2 == 1 && j % 4 / 2 == 0) {
+                offset = 4;
+            } else {
+                offset = 6;
+            }
+            attr = (attr >> offset) & 0xff;
+
+            // 2. handle pattern table
+            int indexInNameTable = i * 32 + j;
+            int indexInPatternTable = ppuBus_->read(indexInNameTable + 0x2000);
+            // std::cout << i << ' ' << j << ' ' << indexInPatternTable << std::endl;
+
+            for(int x = 0; x < 8; x++) {
+                u8 tileLeft = ppuBus_->read(indexInPatternTable * 16 + x);
+                u8 tileRight = ppuBus_->read(indexInPatternTable * 16 + 8 + x);
+                for(int y = 0; y < 8; y++) {
+                    // low on the left
+                    u8 leftBit = (tileLeft & (1 << (7 - y))) != 0;
+                    u8 rightBit = (tileRight & (1 << (7 - y))) != 0;
+                    u8 combined = leftBit + (rightBit << 1);
+
+
+                    this->screen[i * 8 + x][j * 8 + y][0] = Constant::palette[4 * attr + combined][0];
+                    this->screen[i * 8 + x][j * 8 + y][1] = Constant::palette[4 * attr + combined][1];
+                    this->screen[i * 8 + x][j * 8 + y][2] = Constant::palette[4 * attr + combined][2];
+                }
+            }
+        }
+    }
+}
+
+void PPU::getCHR() {
+    for(int i = 0; i < 16; i++) {
+        for(int j = 0; j < 16; j++) {
+
+            int indexInPatternTable = 16 * i + j;
+
+            for(int x = 0; x < 8; x++) {
+                u8 tileLeft = ppuBus_->read(indexInPatternTable * 16 + x);
+                u8 tileRight = ppuBus_->read(indexInPatternTable * 16 + 8 + x);
+                for(int y = 0; y < 8; y++) {
+                    // low on the left
+                    u8 leftBit = (tileLeft & (1 << y)) != 0;
+                    u8 rightBit = (tileRight & (1 << y)) != 0;
+                    u8 combined = leftBit + (rightBit << 1);
+
+                    this->chrScreen[i * 8 + x][j * 8 + y][0] = Constant::palette[0 + combined][0];
+                    this->chrScreen[i * 8 + x][j * 8 + y][1] = Constant::palette[0 + combined][1];
+                    this->chrScreen[i * 8 + x][j * 8 + y][2] = Constant::palette[0 + combined][2];
+                }
+            }
+        }
     }
 }

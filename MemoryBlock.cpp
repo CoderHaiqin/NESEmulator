@@ -1,12 +1,10 @@
 #include "MemoryBlock.h"
 
-MemoryBlock::MemoryBlock(u16 length) {
-    m_ = new u8[length];
+MemoryBlock::MemoryBlock(u16 length) : m_(length) {
     length_ = length;
 }
 
 MemoryBlock::~MemoryBlock() {
-    delete [] m_;
 }
 
 void MemoryBlock::write(u16 addr, u8 value) {

@@ -25,7 +25,7 @@ void Registers::setP(int position, bool value) {
 }
 
 void Registers::setNZ(u8 value) {
-    setP(Registers::POS_N, value & (0x8000));
+    setP(Registers::POS_N, value & (0x80));
     setP(Registers::POS_Z, value == 0);
 }
 

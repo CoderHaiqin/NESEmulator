@@ -1,5 +1,5 @@
 #include "bus.h"
-#include <iostream>
+#include <QDebug>
 
 Bus::Bus() : ram_(nullptr) {}
 
@@ -20,6 +20,7 @@ void Bus::bindPPU(PPU* ppu) {
 }
 
 uint8_t Bus::read(u16 address) {
+    //qDebug() << "read: " << Qt::hex << Qt::showbase << address << Qt::endl;
     if(address < 0x2000) {
         return ram_->read(address & 0x7ff);
     } else if (address < 0x4000) {
@@ -40,6 +41,8 @@ uint8_t Bus::read(u16 address) {
 }
 
 void Bus::write(u16 address, u8 value) {
+
+    //qDebug() << "write: " << Qt::hex << Qt::showbase << value << " to "<< Qt::hex << Qt::showbase << address<< Qt::endl;
     if(address < 0x2000) {
         ram_->write(address & 0x7ff, value);
     } else if (address < 0x4000) {

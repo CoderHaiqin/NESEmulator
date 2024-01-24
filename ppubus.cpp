@@ -1,13 +1,19 @@
 #include "ppubus.h"
+#include <assert.h>
+#include <QDebug>
 
 PPUBus::PPUBus() {}
 
 void PPUBus::write(u16 addr, u8 value) {
+    // qDebug() << "PPU write: " << Qt::hex << Qt::showbase << addr << " " << value << Qt::endl;
     if(addr < 0x1000) {
+        assert(0);
         ppuMemory_.patternTable0->write(addr, value);
     } else if(addr < 0x2000) {
+        assert(0);
         ppuMemory_.patternTable1->write(addr - 0x1000, value);
     } else if (addr < 0x2400) {
+
         ppuMemory_.nameTable0[addr - 0x2000] = value;
     } else if (addr < 0x2800) {
         ppuMemory_.nameTable1[addr - 0x2400] = value;

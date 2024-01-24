@@ -33,6 +33,7 @@ public:
     std::vector<std::vector<std::function<int(Registers* registers, Bus* bus, int access)>>> funcTable;
 
     std::vector<std::vector<Instr*>> instrTable;
+    std::vector<std::vector<std::string>> nameTable;
 
     static Instr* generateInstr(u8 high, u8 low);
 };
@@ -120,7 +121,7 @@ int JMP(Registers* registers, Bus* bus, int access);
 
 int JSR(Registers* registers, Bus* bus, int access);
 
-int RTX(Registers* registers, Bus* bus, int access);
+int RTS(Registers* registers, Bus* bus, int access);
 
 int RTI(Registers* registers, Bus* bus, int access);
 
@@ -165,6 +166,31 @@ int TXA(Registers* registers, Bus* bus, int access);
 int TYA(Registers* registers, Bus* bus, int access);
 
 int NOP(Registers* registers, Bus* bus, int access);
+
+// extra instruction
+int ALR(Registers* registers, Bus* bus, int access);
+
+int ANC(Registers* registers, Bus* bus, int access);
+
+int ARR(Registers* registers, Bus* bus, int access);
+
+int AXS(Registers* registers, Bus* bus, int access);
+
+int LAX(Registers* registers, Bus* bus, int access);
+
+int SAX(Registers* registers, Bus* bus, int access);
+
+int DCP(Registers* registers, Bus* bus, int access);
+
+int ISC(Registers* registers, Bus* bus, int access);
+
+int RLA(Registers* registers, Bus* bus, int access);
+
+int RRA(Registers* registers, Bus* bus, int access);
+
+int SLO(Registers* registers, Bus* bus, int access);
+
+int SRE(Registers* registers, Bus* bus, int access);
 }
 
 namespace access6502{

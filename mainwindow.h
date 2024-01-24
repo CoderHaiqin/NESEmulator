@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "machine.h"
+#include <QPainter>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,11 +17,15 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void paintEvent(QPaintEvent *event) override;
+
 private:
     Ui::MainWindow *ui;
 
     Machine machine;
     QTimer* timer;
+
+    QRgb pixels[Constant::screenWidth * Constant::screenHeight];
 
 private slots:
     void update();

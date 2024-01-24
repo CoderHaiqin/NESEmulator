@@ -1,12 +1,12 @@
 #ifndef RAM_H
 #define RAM_H
 #include "type.h"
-
+#include <vector>
 
 class MemoryBlock
 {
 public:
-    u8* m_;
+    std::vector<u8> m_;
     u16 length_;
 
     MemoryBlock(u16 length);
