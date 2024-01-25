@@ -19,25 +19,26 @@ void Bus::bindPPU(PPU* ppu) {
     ppu_ = ppu;
 }
 
-uint8_t Bus::read(u16 address) {
+u8 Bus::read(u16 address) {
     //qDebug() << "read: " << Qt::hex << Qt::showbase << address << Qt::endl;
+    u8 result = 0;
     if(address < 0x2000) {
-        return ram_->read(address & 0x7ff);
+        result = ram_->read(address & 0x7ff);
     } else if (address < 0x4000) {
-        return ppu_->read(address - 0x2000);
+        result = ppu_->read(address - 0x2000);
     } else if(address < 0x4020) {
-
+        result = ioRegister_->read(address - 0x4000);
     } else if(address < 0x6000) {
 
     } else if(address < 0x8000) {
 
     } else if(address < 0xc000) {
-        return prg_1_->read(address - 0x8000);
+        result = prg_1_->read(address - 0x8000);
     } else {
-        return prg_2_->read(address - 0xc000);
+        result = prg_2_->read(address - 0xc000);
     }
 
-    return 0;
+    return result;
 }
 
 void Bus::write(u16 address, u8 value) {
@@ -48,7 +49,7 @@ void Bus::write(u16 address, u8 value) {
     } else if (address < 0x4000) {
         ppu_->write(address - 0x2000, value);
     } else if(address < 0x4020) {
-
+        ioRegister_->write(address - 0x4000, value);
     } else if(address < 0x6000) {
 
     } else if(address < 0x8000) {
@@ -58,4 +59,8 @@ void Bus::write(u16 address, u8 value) {
     } else {
         prg_2_->write(address - 0xc000, value);
     }
+}
+
+void Bus::bindIORegister(IORegister* ioRegister) {
+    ioRegister_ = ioRegister;
 }

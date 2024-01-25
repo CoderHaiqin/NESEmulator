@@ -53,6 +53,10 @@ u8 PPU::read(u16 address) {
     return 0;
 }
 
+u8 PPU::getCtrl() {
+    return control_;
+}
+
 u8 PPU::readStatus() {
     return status_;
 }
@@ -194,9 +198,9 @@ void PPU::getCHR() {
                     u8 rightBit = (tileRight & (1 << y)) != 0;
                     u8 combined = leftBit + (rightBit << 1);
 
-                    this->chrScreen[i * 8 + x][j * 8 + y][0] = Constant::palette[0 + combined][0];
-                    this->chrScreen[i * 8 + x][j * 8 + y][1] = Constant::palette[0 + combined][1];
-                    this->chrScreen[i * 8 + x][j * 8 + y][2] = Constant::palette[0 + combined][2];
+                    // this->chrScreen[i * 8 + x][j * 8 + y][0] = Constant::palette[0 + combined][0];
+                    // this->chrScreen[i * 8 + x][j * 8 + y][1] = Constant::palette[0 + combined][1];
+                    // this->chrScreen[i * 8 + x][j * 8 + y][2] = Constant::palette[0 + combined][2];
                 }
             }
         }

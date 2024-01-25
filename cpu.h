@@ -22,6 +22,7 @@ public:
     void execute();
 
     void bindBus(Bus* bus);
+    void nmi();
 };
 
 #endif // CPU_H

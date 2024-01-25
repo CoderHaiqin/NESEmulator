@@ -18,6 +18,9 @@ public:
     ~MainWindow();
 
     void paintEvent(QPaintEvent *event) override;
+    std::map<int, int> keyTable;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
 private:
     Ui::MainWindow *ui;

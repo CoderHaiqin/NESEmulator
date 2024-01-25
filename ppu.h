@@ -26,12 +26,12 @@ private:
 public:
     PPU();
     u8 screen[Constant::screenWidth][Constant::screenHeight][Constant::colorChannel];
-    u8 chrScreen[128][128][3];
 
     void bindPPUBus(PPUBus* ppuBus);
 
     void write(u16 addr, u8 value);
     u8 read(u16 addr);
+    u8 getCtrl();
 
     u8 readStatus();
     u8 readOAMData();

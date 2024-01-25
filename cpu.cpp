@@ -1,5 +1,7 @@
 #include "cpu.h"
+#include <deque>
 #include <iostream>
+#include <list>
 
 CPU::CPU()
 {
@@ -39,14 +41,36 @@ Instr* CPU::fetch() {
 }
 
 void CPU::execute() {
+    static std::list<u16> lastPC(0);
+    static std::list<std::string> lastInstr(0);
 
     if(cycle_ > 0) {
         cycle_--;
         return;
     }
+    if(this->registers_->PC < 0x8000) {
+        int a = 0;
+    }
+    lastPC.push_back(registers_->PC);
+    if(lastPC.size() > 100) {
+        lastPC.pop_front();
+    }
+    u8 tmp = bus_->read(registers_->PC);
+    u8 high = (tmp & (0xf0)) >> 4;
+    u8 low = tmp & (0x0f);
+    lastInstr.push_back(InstrGenerator::getInstrName(high, low));
+    if(lastInstr.size() > 100) {
+        lastInstr.pop_front();
+    }
+
     // std::cout << this->registers_->PC << std::endl;
     Instr* instr = fetch();
     cycle_ = instr->execute(registers_, bus_);
 
+    cycle_--;
+}
+
+void CPU::nmi() {
+    cycle_ = instr6502::NMI(registers_, bus_);
     cycle_--;
 }

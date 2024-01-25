@@ -4,6 +4,7 @@
 #include "cpu.h"
 #include "ppu.h"
 #include "qrgb.h"
+#include "ioregister.h"
 
 class Machine
 {
@@ -19,6 +20,9 @@ private:
     PPU ppu;
     PPUBus ppuBus;
 
+    IORegister ioRegister;
+    bool keyState[0x10];
+
 public:
     Machine();
     ~Machine();
@@ -28,6 +32,8 @@ public:
     void update();
 
     void get(QRgb* pixels);
+
+    void input(int key, bool flag);
 };
 
 #endif // MACHINE_H

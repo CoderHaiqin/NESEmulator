@@ -35,10 +35,15 @@ public:
     std::vector<std::vector<Instr*>> instrTable;
     std::vector<std::vector<std::string>> nameTable;
 
+    static InstrGenerator& Instance();
+
     static Instr* generateInstr(u8 high, u8 low);
+    static std::string getInstrName(u8 high, u8 low);
 };
 
 namespace instr6502 {
+int NMI(Registers* registers, Bus* bus);
+
 int BRK(Registers* registers, Bus* bus, int access);
 
 int LDA(Registers* registers, Bus* bus, int access);

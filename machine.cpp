@@ -11,7 +11,12 @@ Machine::Machine() : cpu(), bus(), ppu(), ppuBus()
     this->bus.bindRAM(ram);
     this->ppu.bindPPUBus(&ppuBus);
     this->bus.bindPPU(&ppu);
+    this->bus.bindIORegister(&ioRegister);
+    this->ioRegister.bindKeyState(keyState);
 
+    for(int i = 0; i < 0x10; i++) {
+        keyState[i] = 0;
+    }
 }
 
 Machine::~Machine() {
@@ -69,11 +74,15 @@ void Machine::load(const std::string& path) {
 }
 
 void Machine::update() {
-    for(int i = 0; i < 100; i++) {
+    for(int i = 0; i < 30000; i++) {
         this->cpu.execute();
     }
     this->ppu.startVBlank();
-    for(int i = 0; i < 31350; i++) {
+    if(this->ppu.getCtrl() >> 7) {
+
+        this->cpu.nmi();
+    }
+    for(int i = 0; i < 30000; i++) {
         this->cpu.execute();
     }
     this->ppu.endVBlank();
@@ -93,4 +102,8 @@ void Machine::get(QRgb* pixels) {
     //         pixels[128 * i + j] = qRgb(ppu->chrScreen[i][j][0], ppu->chrScreen[i][j][1], ppu->chrScreen[i][j][2]);
     //     }
     // }
+}
+
+void Machine::input(int key, bool flag) {
+    keyState[key] = flag;
 }

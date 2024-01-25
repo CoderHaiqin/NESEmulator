@@ -150,24 +150,57 @@ InstrGenerator::InstrGenerator(const std::string& path) {
     }
 }
 
-Instr* InstrGenerator::generateInstr(u8 high, u8 low) {
+InstrGenerator& InstrGenerator::Instance() {
     static InstrGenerator g("./instr.txt");
+
+    return g;
+}
+
+Instr* InstrGenerator::generateInstr(u8 high, u8 low) {
     //std::cout << g.nameTable[high][low] << std::endl;
-    return g.instrTable[high][low];
+    return Instance().instrTable[high][low];
+}
+
+std::string InstrGenerator::getInstrName(u8 high, u8 low) {
+    std::string name = Instance().nameTable[high][low];
+    return name;
 }
 
 namespace instr6502 {
+int NMI(Registers* registers, Bus* bus) {
+
+    bus->write(registers->SP | 0x100, ((registers->PC) & 0xff00) >> 8);
+    registers->SP--;
+    bus->write(registers->SP | 0x100, (registers->PC) & 0x00ff);
+    registers->SP--;
+    registers->setP(Registers::POS_B, false);
+    registers->setP(Registers::POS_I, false);
+    bus->write(registers->SP | 0x100, registers->P);
+    registers->SP--;
+
+    u16 low = bus->read(0xfffa);
+    u16 high = bus->read(0xfffb);
+    registers->PC = (high << 8) | low;
+
+    registers->setP(Registers::POS_B, 1);
+
+    return 7;
+}
 int BRK(Registers* registers, Bus* bus, int access) {
     auto accessAddr = access6502::getAccessFunc(access);
     int cycle = 0;
     accessAddr(registers, bus, cycle);
 
+    bus->write(registers->SP | 0x100, ((registers->PC - 1) & 0xff00) >> 8);
     registers->SP--;
-    bus->write(registers->SP, (registers->PC & 0xff00) >> 8);
+    bus->write(registers->SP | 0x100, (registers->PC - 1) & 0x00ff);
     registers->SP--;
-    bus->write(registers->SP, registers->PC & 0x00ff);
+
+    registers->setP(Registers::POS_B, true);
+    registers->setP(Registers::POS_I, true);
+    bus->write(registers->SP | 0x100, registers->P);
+    registers->setP(Registers::POS_B, false);
     registers->SP--;
-    bus->write(registers->SP, registers->P);
 
     u16 low = bus->read(0xfffe);
     u16 high = bus->read(0xffff);
@@ -259,8 +292,8 @@ int PHA(Registers* registers, Bus* bus, int access) {
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
 
-    registers->SP -= 8;
     addr = registers->SP | (0x0100);
+    registers->SP -= 1;
     bus->write(addr, registers->A);
 
     return cycle;
@@ -271,8 +304,8 @@ int PHX(Registers* registers, Bus* bus, int access) {
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
 
-    registers->SP -= 8;
     addr = registers->SP | (0x0100);
+    registers->SP -= 1;
     bus->write(addr, registers->X);
 
     return cycle;
@@ -283,8 +316,8 @@ int PHY(Registers* registers, Bus* bus, int access) {
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
 
-    registers->SP -= 8;
     addr = registers->SP | (0x0100);
+    registers->SP -= 1;
     bus->write(addr, registers->Y);
 
     return cycle;
@@ -295,9 +328,9 @@ int PHP(Registers* registers, Bus* bus, int access) {
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
 
-    registers->SP -= 8;
     addr = registers->SP | (0x0100);
-    bus->write(addr, registers->P);
+    registers->SP -= 1;
+    bus->write(addr, registers->P | (1 << Registers::POS_B));
 
     return cycle;
 }
@@ -307,13 +340,13 @@ int PLA(Registers* registers, Bus* bus, int access) {
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
 
+    registers->SP += 1;
     addr = registers->SP | (0x0100);
 
     u8 value = bus->read(addr);
     registers->setNZ(value);
 
     registers->A = value;
-    registers->SP += 8;
 
     return cycle;
 }
@@ -323,13 +356,13 @@ int PLX(Registers* registers, Bus* bus, int access) {
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
 
+    registers->SP += 1;
     addr = registers->SP | (0x0100);
 
     u8 value = bus->read(addr);
     registers->setNZ(value);
 
     registers->X = value;
-    registers->SP += 8;
 
     return cycle;
 }
@@ -339,13 +372,13 @@ int PLY(Registers* registers, Bus* bus, int access) {
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
 
+    registers->SP += 1;
     addr = registers->SP | (0x0100);
 
     u8 value = bus->read(addr);
     registers->setNZ(value);
 
     registers->Y = value;
-    registers->SP += 8;
 
     return cycle;
 }
@@ -355,9 +388,9 @@ int PLP(Registers* registers, Bus* bus, int access) {
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
 
+    registers->SP += 1;
     addr = registers->SP | (0x0100);
     registers->P = bus->read(addr);
-    registers->SP += 8;
 
     return cycle;
 }
@@ -456,27 +489,64 @@ int DEC(Registers* registers, Bus* bus, int access) {
 }
 
 int ASL(Registers* registers, Bus* bus, int access) {
-    u8 value = registers->A;
+    if(access == 0) {
+        u8 value = registers->A;
+        u8 high = value & (0x80);
+
+        value = value << 1;
+
+        registers->setNZ(value);
+        registers->setP(Registers::POS_C, high);
+
+        registers->A = value;
+
+        return 0;
+    }
+    auto accessAddr = access6502::getAccessFunc(access);
+    int cycle = 0;
+    u16 addr = accessAddr(registers, bus, cycle);
+
+    u8 value = bus->read(addr);
     u8 high = value & (0x80);
 
     value = value << 1;
 
     registers->setNZ(value);
+    registers->setP(Registers::POS_C, high);
 
-    registers->A = value;
+    bus->write(addr, value);
 
     return 0;
+
 }
 
 int LSR(Registers* registers, Bus* bus, int access) {
-    u8 value = registers->A;
+    if(access == 0) {
+        u8 value = registers->A;
+        u8 low = value & (0x01);
+
+        value = value >> 1;
+
+        registers->setNZ(value);
+        registers->setP(Registers::POS_C, low);
+
+        registers->A = value;
+
+        return 0;
+    }
+    auto accessAddr = access6502::getAccessFunc(access);
+    int cycle = 0;
+    u16 addr = accessAddr(registers, bus, cycle);
+
+    u8 value = bus->read(addr);
     u8 low = value & (0x01);
 
     value = value >> 1;
 
     registers->setNZ(value);
+    registers->setP(Registers::POS_C, low);
 
-    registers->A = value;
+    bus->write(addr, value);
 
     return 0;
 }
@@ -485,6 +555,7 @@ int ROL(Registers* registers, Bus* bus, int access) {
     if(access == 0) {
         u8 value = registers->A;
         u8 C = registers->P & (0x01);
+        registers->setP(Registers::POS_C, value & 0x80);
         value = value << 1;
         value = value | C;
 
@@ -501,6 +572,7 @@ int ROL(Registers* registers, Bus* bus, int access) {
 
     u8 value = bus->read(addr);
     u8 C = registers->P & (0x01);
+    registers->setP(Registers::POS_C, value & 0x80);
     value = value << 1;
     value = value | C;
 
@@ -515,6 +587,7 @@ int ROR(Registers* registers, Bus* bus, int access) {
     if(access == 0) {
         u8 value = registers->A;
         u8 C = (registers->P & (0x01)) << 7;
+        registers->setP(Registers::POS_C, value & 1);
         value = value >> 1;
         value = value | C;
 
@@ -531,6 +604,7 @@ int ROR(Registers* registers, Bus* bus, int access) {
 
     u8 value = bus->read(addr);
     u8 C = (registers->P & (0x01)) << 7;
+    registers->setP(Registers::POS_C, value & 1);
     value = value >> 1;
     value = value | C;
 
@@ -600,18 +674,10 @@ int CMP(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     u8 value = bus->read(addr);
-    registers->setP(Registers::POS_N, (value - registers->A) >> 7);
 
-    if(registers->A < value) {
-        registers->setP(Registers::POS_Z, 0);
-        registers->setP(Registers::POS_C, 0);
-    } else if(registers->A == value) {
-        registers->setP(Registers::POS_Z, 1);
-        registers->setP(Registers::POS_C, 1);
-    } else {
-        registers->setP(Registers::POS_Z, 0);
-        registers->setP(Registers::POS_C, 1);
-    }
+    u16 result16 = (u16)registers->A - (u16)value;
+    registers->setP(Registers::POS_C, (!(result16 & (u16)0x8000)));
+    registers->setNZ((u8)result16);
 
     return cycle;
 
@@ -623,18 +689,10 @@ int CPX(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     u8 value = bus->read(addr);
-    registers->setP(Registers::POS_N, (value - registers->X) >> 7);
 
-    if(registers->X < value) {
-        registers->setP(Registers::POS_Z, 0);
-        registers->setP(Registers::POS_C, 0);
-    } else if(registers->X == value) {
-        registers->setP(Registers::POS_Z, 1);
-        registers->setP(Registers::POS_C, 1);
-    } else {
-        registers->setP(Registers::POS_Z, 0);
-        registers->setP(Registers::POS_C, 1);
-    }
+    u16 result16 = (u16)registers->X - (u16)value;
+    registers->setP(Registers::POS_C, (!(result16 & (u16)0x8000)));
+    registers->setNZ((u8)result16);
 
     return cycle;
 }
@@ -645,18 +703,10 @@ int CPY(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     u8 value = bus->read(addr);
-    registers->setP(Registers::POS_N, (value - registers->Y) >> 7);
 
-    if(registers->Y < value) {
-        registers->setP(Registers::POS_Z, 0);
-        registers->setP(Registers::POS_C, 0);
-    } else if(registers->Y == value) {
-        registers->setP(Registers::POS_Z, 1);
-        registers->setP(Registers::POS_C, 1);
-    } else {
-        registers->setP(Registers::POS_Z, 0);
-        registers->setP(Registers::POS_C, 1);
-    }
+    u16 result16 = (u16)registers->Y - (u16)value;
+    registers->setP(Registers::POS_C, (!(result16 & (u16)0x8000)));
+    registers->setNZ((u8)result16);
 
     return cycle;
 }
@@ -667,13 +717,12 @@ int ADC(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     u8 value = bus->read(addr);
-
-    u8 prevA = registers->A;
-    registers->setP(Registers::POS_C, registers->carry(prevA, value, registers->getP(Registers::POS_C)));
-    registers->A = registers->A + value + registers->getP(Registers::POS_C);
-
+    u16 result16 = (u16)registers->A + (u16)value + (registers->getP(Registers::POS_C) ? 1 : 0);
+    registers->setP(Registers::POS_C, result16 >> 8);
+    u8 result8 = (u8)result16;
+    registers->setP(Registers::POS_V, !((registers->A ^ value) & 0x80) && ((registers->A ^ result8) & 0x80));
+    registers->A = result8;
     registers->setNZ(registers->A);
-    registers->setP(Registers::POS_V, (prevA & 0x8000) != (registers->A & 0x8000));
 
     return cycle;
 }
@@ -684,12 +733,13 @@ int SBC(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     u8 value = bus->read(addr);
-    u8 prevA = registers->A;
-    registers->setP(Registers::POS_C, registers->carry(prevA, -value, -(~(u8)registers->getP(Registers::POS_C))));
-    registers->A = registers->A - value - (~(u8)registers->getP(Registers::POS_C));
 
+    u16 result16 = (u16)registers->A - (u16)value - (registers->getP(Registers::POS_C) ? 0 : 1);
+    registers->setP(Registers::POS_C, (!(result16 >> 8)));
+    u8 result8 = (u8)result16;
+    registers->setP(Registers::POS_V, (((registers->A ^ value) & 0x80) && ((registers->A ^ result8) & 0x80)));
+    registers->A = result8;
     registers->setNZ(registers->A);
-    registers->setP(Registers::POS_V, (prevA & 0x8000) != (registers->A & 0x8000));
 
     return cycle;
 }
@@ -709,11 +759,11 @@ int JSR(Registers* registers, Bus* bus, int access) {
     int cycle = 0;
     u16 addr = accessAddr(registers, bus, cycle);
 
-
+    u16 tmp = registers->PC - 1;
+    bus->write(registers->SP | 0x100, (tmp & 0xff00) >> 8);
     registers->SP--;
-    bus->write(registers->SP, (registers->PC & 0xff00) >> 8);
+    bus->write(registers->SP | 0x100, tmp & 0x00ff);
     registers->SP--;
-    bus->write(registers->SP, registers->PC & 0x00ff);
 
     registers->PC = addr;
 
@@ -726,13 +776,13 @@ int RTS(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     u16 prevPC = 0;
-    u16 low = bus->read(registers->SP);
     registers->SP++;
-    u16 high = bus->read(registers->SP);
+    u16 low = bus->read(registers->SP | 0x100);
     registers->SP++;
+    u16 high = bus->read(registers->SP | 0x100);
     prevPC = (high << 8) | low;
 
-    registers->PC = prevPC;
+    registers->PC = prevPC + 1;
 }
 
 int RTI(Registers* registers, Bus* bus, int access) {
@@ -741,14 +791,16 @@ int RTI(Registers* registers, Bus* bus, int access) {
     u16 addr = accessAddr(registers, bus, cycle);
 
     u16 prevPC = 0;
-    u8 prevP = bus->read(registers->SP);
     registers->SP++;
-    u16 low = bus->read(registers->SP);
+    u8 prevP = bus->read(registers->SP | 0x100);
     registers->SP++;
-    u16 high = bus->read(registers->SP);
+    u16 low = bus->read(registers->SP | 0x100);
     registers->SP++;
+    u16 high = bus->read(registers->SP | 0x100);
 
     registers->P = prevP;
+    registers->setP(Registers::POS_B, false);
+
     prevPC = (high << 8) | low;
 
     registers->PC = prevPC;
@@ -1180,15 +1232,15 @@ u16 indirectAccess(Registers* registers, Bus* bus, int& cycle) {
     targetAddr = (((u16)(high)) << 8) | low;
 
     cycle = 0;
-    return bus->read(targetAddr);
+    return targetAddr;
 }
 
 u16 indirectAccessX(Registers* registers, Bus* bus, int& cycle) {
     u8 offset = bus->read(registers->PC) + registers->X;
     registers->PC++;
 
-    u8 low = bus->read(0x00ff & offset);
-    u8 high = bus->read(0x00ff & (offset + 1));
+    u8 low = bus->read(offset & 0xff);
+    u8 high = bus->read((offset + 1) & 0xff);
 
     u16 targetAddr = (((u16)(high)) << 8) | low;
 
@@ -1232,8 +1284,18 @@ u16 indirectAbsoluteAccess(Registers* registers, Bus* bus, int& cycle) {
     registers->PC++;
     u8 high = bus->read(addr2);
 
-    u16 targetAddr = (((u16)(high)) << 8) | low;
-    return bus->read(targetAddr);
+    u16 base1 = (((u16)(high)) << 8) | low;
+
+    const uint16_t base2
+        = (base1 & (uint16_t)0xFF00)
+          | ((base1 + 1) & (uint16_t)0x00FF)
+        ;
+    const uint16_t address
+        = (uint16_t)bus->read(base1)
+          | (uint16_t)((uint16_t)bus->read(base2) << 8)
+        ;
+
+    return address;
 }
 
 std::function<u16(Registers* registers, Bus* bus, int& cycle)> getAccessFunc(int access) {
