@@ -24,7 +24,9 @@ MainWindow::MainWindow(QWidget *parent)
     keyTable[Qt::Key_A] = 6;
     keyTable[Qt::Key_D] = 7;
 
-    machine.load("./nestest.nes");
+    // machine.load("./nestest.nes");
+    // machine.load("./color_test.nes");
+    machine.load("./m.nes");
 
 }
 
@@ -37,6 +39,8 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     QPainter p(this);
     this->machine.get(this->pixels);
     QImage img((uchar*)pixels, Constant::screenWidth, Constant::screenHeight, QImage::Format_ARGB32);
+
+    // QImage img((uchar*)pixels, 128, 128, QImage::Format_ARGB32);
     img = img.scaled(Constant::screenWidth * 2, Constant::screenHeight * 2);
     p.drawImage(0, 0, img);
 }

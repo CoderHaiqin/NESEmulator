@@ -24,7 +24,13 @@ void PPUBus::write(u16 addr, u8 value) {
     } else if (addr < 0x3f00) {
         write(addr - 0x1000, value);
     } else {
-        ppuMemory_.PaletteRAMIndex[(addr - 0x3f00) % 0x20] = value;
+        addr -= 0x3f00;
+        addr = addr & 0x1f;
+        if (!(addr & (u16)0x03)) {
+            addr = addr & (~(0x10));
+        }
+        ppuMemory_.PaletteRAMIndex[addr] = value;
+
     }
 }
 
@@ -44,7 +50,12 @@ u8 PPUBus::read(u16 addr) {
     } else if (addr < 0x3f00) {
         return read(addr - 0x1000);
     } else {
-        return ppuMemory_.PaletteRAMIndex[(addr - 0x3f00) % 0x20];
+        addr -= 0x3f00;
+        addr = addr & 0x1f;
+        if (!(addr & (u16)0x03)) {
+            addr = addr & (~(0x10));
+        }
+        return ppuMemory_.PaletteRAMIndex[addr];
     }
 
     return 0;

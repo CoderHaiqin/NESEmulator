@@ -51,6 +51,10 @@ void CPU::execute() {
     if(this->registers_->PC < 0x8000) {
         int a = 0;
     }
+    // if(this->registers_->PC == 0x8e96) {
+    //     int a = 0;
+    // }
+
     lastPC.push_back(registers_->PC);
     if(lastPC.size() > 100) {
         lastPC.pop_front();

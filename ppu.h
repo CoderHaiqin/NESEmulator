@@ -13,10 +13,15 @@ private:
     u8 OAMAddr_ = 0;
     // u8 OAMData_;
 
-    u8 w_register_ = 0;
+    u8 w_register_ = 1;
     u8 scroll_[2] = {0};
+
+    u16 addr_tmp_ = 0;
     u16 addr_ = 0;
+    u16 data_buffer = 0;
     u8 OAMDMA_ = 0;
+
+    u8 ppuram[0x100] = {0};
 
     PPUBus* ppuBus_ = nullptr;
 
@@ -26,6 +31,7 @@ private:
 public:
     PPU();
     u8 screen[Constant::screenWidth][Constant::screenHeight][Constant::colorChannel];
+    u8 chrScreen[128][128][3];
 
     void bindPPUBus(PPUBus* ppuBus);
 

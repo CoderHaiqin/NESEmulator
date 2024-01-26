@@ -23,6 +23,9 @@ u8 Bus::read(u16 address) {
     //qDebug() << "read: " << Qt::hex << Qt::showbase << address << Qt::endl;
     u8 result = 0;
     if(address < 0x2000) {
+        // if(address == 0x300) {
+        //     qDebug() << "read from 0x300 " << ram_->read(address & 0x7ff) << Qt::endl;
+        // }
         result = ram_->read(address & 0x7ff);
     } else if (address < 0x4000) {
         result = ppu_->read(address - 0x2000);
@@ -45,6 +48,12 @@ void Bus::write(u16 address, u8 value) {
 
     //qDebug() << "write: " << Qt::hex << Qt::showbase << value << " to "<< Qt::hex << Qt::showbase << address<< Qt::endl;
     if(address < 0x2000) {
+        // if(address == 0x300) {
+        //     if(value == 166) {
+        //         int a = 0;
+        //     }
+        //     qDebug() << "write to 0x300 " << value << Qt::endl;
+        // }
         ram_->write(address & 0x7ff, value);
     } else if (address < 0x4000) {
         ppu_->write(address - 0x2000, value);

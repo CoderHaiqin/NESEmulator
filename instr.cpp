@@ -220,6 +220,9 @@ int LDA(Registers* registers, Bus* bus, int access) {
 
     registers->A = value;
     registers->setNZ(value);
+    // if(registers->PC == 0x8ee4) {
+    //     std::cout << "reg a read from"<< addr << " " << (int) value << std::endl;
+    // }
 
     return cycle;
 }
