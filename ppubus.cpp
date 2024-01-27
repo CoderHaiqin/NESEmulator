@@ -5,6 +5,7 @@
 PPUBus::PPUBus() {}
 
 void PPUBus::write(u16 addr, u8 value) {
+
     // qDebug() << "PPU write: " << Qt::hex << Qt::showbase << addr << " " << value << Qt::endl;
     if(addr < 0x1000) {
         assert(0);
@@ -53,7 +54,7 @@ u8 PPUBus::read(u16 addr) {
         addr -= 0x3f00;
         addr = addr & 0x1f;
         if (!(addr & (u16)0x03)) {
-            addr = addr & (~(0x10));
+            addr = addr & (~(0xc));
         }
         return ppuMemory_.PaletteRAMIndex[addr];
     }

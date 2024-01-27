@@ -157,6 +157,7 @@ void PPU::endVBlank() {
 void PPU::get() {
     // find the attribute table for the 4x4 group
 
+
     for(int i = 0; i < 30; i++) {
         for(int j = 0; j < 32; j++) {
             // 1. handle attribution table
@@ -172,11 +173,12 @@ void PPU::get() {
             } else {
                 offset = 6;
             }
-            attr = (attr >> offset) & 0xff;
+            attr = (attr >> offset) & 0x3;
 
             // 2. handle pattern table
             int indexInNameTable = i * 32 + j;
             int indexInPatternTable = ppuBus_->read(indexInNameTable + 0x2000);
+
             // std::cout << i << ' ' << j << ' ' << indexInNameTable << ' ' << indexInPatternTable << std::endl;
 
             for(int x = 0; x < 8; x++) {
@@ -200,6 +202,12 @@ void PPU::get() {
                     // }
                     // t = paletteIndex;
 
+                    if(i == 29 && j == 0 && x == 0 && y == 0) {
+                        std::cout << (int)paletteIndex << std::endl;
+                    }
+                    if(i == 29 && j == 1 && x == 0 && y == 0) {
+                        std::cout << (int)paletteIndex << std::endl;
+                    }
                     this->screen[i * 8 + x][j * 8 + y][0] = Constant::palette[paletteIndex][0];
                     this->screen[i * 8 + x][j * 8 + y][1] = Constant::palette[paletteIndex][1];
                     this->screen[i * 8 + x][j * 8 + y][2] = Constant::palette[paletteIndex][2];

@@ -37,6 +37,7 @@ void MainWindow::update() {
 
 void MainWindow::paintEvent(QPaintEvent *event) {
     QPainter p(this);
+    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
     this->machine.get(this->pixels);
     QImage img((uchar*)pixels, Constant::screenWidth, Constant::screenHeight, QImage::Format_ARGB32);
 
