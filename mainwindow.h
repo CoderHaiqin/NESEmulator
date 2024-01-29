@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include "machine.h"
 #include <QPainter>
+#include <QGraphicsScene>
 
+#include <QGraphicsPixmapItem>
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -28,6 +30,8 @@ private:
     Machine machine;
     QTimer* timer;
 
+    QGraphicsScene* scene_game;
+    QGraphicsPixmapItem *pixmap_lp;
     QRgb pixels[Constant::screenWidth * Constant::screenHeight];
 
 private slots:

@@ -25,6 +25,9 @@ void CPU::reset() {
     u8 low = bus_->read(0xFFFC);
     u8 high = bus_->read(0xFFFD);
     registers_->PC = u16(high << 8) + low;
+
+    cycle_ = 0;
+    clockCount_ = 0;
 }
 
 void CPU::bindBus(Bus *bus) {
@@ -43,14 +46,14 @@ Instr* CPU::fetch() {
 void CPU::execute() {
     static std::list<u16> lastPC(0);
     static std::list<std::string> lastInstr(0);
-
+    clockCount_++;
     if(cycle_ > 0) {
         cycle_--;
         return;
     }
-    if(this->registers_->PC < 0x8000) {
-        int a = 0;
-    }
+    // if(this->registers_->PC < 0x8000) {
+    //     int a = 0;
+    // }
     // if(this->registers_->PC == 0x8e96) {
     //     int a = 0;
     // }
@@ -69,7 +72,7 @@ void CPU::execute() {
 
     // std::cout << this->registers_->PC << std::endl;
     Instr* instr = fetch();
-    cycle_ = instr->execute(registers_, bus_);
+    cycle_ += instr->execute(registers_, bus_);
 
     cycle_--;
 }
@@ -77,4 +80,8 @@ void CPU::execute() {
 void CPU::nmi() {
     cycle_ = instr6502::NMI(registers_, bus_);
     cycle_--;
+}
+
+void CPU::oamCycle() {
+    cycle_ += 513 + clockCount_ & 1;
 }

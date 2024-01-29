@@ -5,7 +5,11 @@
 PPUBus::PPUBus() {}
 
 void PPUBus::write(u16 addr, u8 value) {
-
+    static std::list<u16> lastaddr(0);
+    lastaddr.push_back(addr);
+    if(lastaddr.size() > 100) {
+        lastaddr.pop_front();
+    }
     // qDebug() << "PPU write: " << Qt::hex << Qt::showbase << addr << " " << value << Qt::endl;
     if(addr < 0x1000) {
         assert(0);
@@ -37,6 +41,8 @@ void PPUBus::write(u16 addr, u8 value) {
 
 u8 PPUBus::read(u16 addr) {
     if(addr < 0x1000) {
+
+
         return ppuMemory_.patternTable0->read(addr);
     } else if(addr < 0x2000) {
         return ppuMemory_.patternTable1->read(addr - 0x1000);

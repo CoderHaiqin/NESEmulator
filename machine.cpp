@@ -7,11 +7,16 @@
 Machine::Machine() : cpu(), bus(), ppu(), ppuBus()
 {
     this->ram = new MemoryBlock(0x800);
+
     this->cpu.bindBus(&bus);
+
     this->bus.bindRAM(ram);
-    this->ppu.bindPPUBus(&ppuBus);
     this->bus.bindPPU(&ppu);
     this->bus.bindIORegister(&ioRegister);
+    this->bus.bindCPU(&cpu);
+
+    this->ppu.bindPPUBus(&ppuBus);
+    this->ppu.bindCPU(&cpu);
     this->ioRegister.bindKeyState(keyState);
 
     for(int i = 0; i < 0x10; i++) {
@@ -74,22 +79,17 @@ void Machine::load(const std::string& path) {
 }
 
 void Machine::update() {
-    for(int i = 0; i < 20565; i++) {
-        this->cpu.execute();
+    for (int i = 0; i < 29781; ++i) //Around one frame
+    {
+        ppu.execute();
+        ppu.execute();
+        ppu.execute();
+        cpu.execute();
     }
-    this->ppu.startVBlank();
-    if(this->ppu.getCtrl() >> 7) {
 
-        this->cpu.nmi();
-    }
-    for(int i = 0; i < 10000; i++) {
-        this->cpu.execute();
-    }
-    this->ppu.endVBlank();
 }
 
 void Machine::get(QRgb* pixels) {
-    ppu.get();
     for(int i = 0; i < 240; i++) {
         for(int j = 0; j < 256; j++) {
             pixels[256 * i + j] = qRgb(ppu.screen[i][j][0], ppu.screen[i][j][1], ppu.screen[i][j][2]);

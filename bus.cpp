@@ -1,5 +1,6 @@
 #include "bus.h"
 #include <QDebug>
+#include "cpu.h"
 
 Bus::Bus() : ram_(nullptr) {}
 
@@ -17,6 +18,10 @@ void Bus::bindPRG_2(MemoryBlock *prg) {
 
 void Bus::bindPPU(PPU* ppu) {
     ppu_ = ppu;
+}
+
+void Bus::bindCPU(CPU* cpu) {
+    cpu_ = cpu;
 }
 
 u8 Bus::read(u16 address) {
@@ -57,7 +62,17 @@ void Bus::write(u16 address, u8 value) {
         ram_->write(address & 0x7ff, value);
     } else if (address < 0x4000) {
         ppu_->write(address - 0x2000, value);
-    } else if(address < 0x4020) {
+    } else if(address == 0x4014) {
+        u16 pageAddr = (u16)(value) << 8;
+        // TODO
+        pageAddr = pageAddr & 0x7ff;
+        cpu_->oamCycle();
+        for(int i = 0; i < 0xff; i++) {
+            ppu_->ppuram[i] = ram_->m_[pageAddr + i];
+        }
+
+    }
+    else if(address < 0x4020) {
         ioRegister_->write(address - 0x4000, value);
     } else if(address < 0x6000) {
 

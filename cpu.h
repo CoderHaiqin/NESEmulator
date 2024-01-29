@@ -11,6 +11,7 @@ private:
     Bus* bus_;
 
     int cycle_;
+    u32 clockCount_;
 
 public:
     CPU();
@@ -23,6 +24,8 @@ public:
 
     void bindBus(Bus* bus);
     void nmi();
+
+    void oamCycle();
 };
 
 #endif // CPU_H

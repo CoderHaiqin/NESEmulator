@@ -5,12 +5,15 @@
 #include "ppu.h"
 #include "ioregister.h"
 
+class CPU;
+
 class Bus
 {
 private:
     MemoryBlock* ram_;
     MemoryBlock* prg_1_;
     MemoryBlock* prg_2_;
+    CPU* cpu_;
     PPU* ppu_;
     IORegister* ioRegister_;
 
@@ -21,6 +24,7 @@ public:
     void bindPRG_1(MemoryBlock* prg);
     void bindPRG_2(MemoryBlock* prg);
     void bindPPU(PPU* ppu);
+    void bindCPU(CPU* cpu);
     void bindIORegister(IORegister* ioRegister);
 
     u8 read(u16 address);
