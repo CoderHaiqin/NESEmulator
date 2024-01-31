@@ -148,9 +148,9 @@ public:
     void startVBlank();
     void endVBlank();
 
-    void get();
+//    void get();
 
-    void getCHR();
+//    void getCHR();
 
     void execute();
 

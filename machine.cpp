@@ -2,7 +2,7 @@
 #include "rom.h"
 #include <iostream>
 #include <assert.h>
-#include <qDebug>
+#include <QDebug>
 
 Machine::Machine() : cpu(), bus(), ppu(), ppuBus()
 {

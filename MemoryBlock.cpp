@@ -1,4 +1,4 @@
-#include "MemoryBlock.h"
+#include "memoryblock.h"
 
 MemoryBlock::MemoryBlock(u16 length) : m_(length) {
     length_ = length;

@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     timer = new QTimer(this);
     timer->setTimerType(Qt::PreciseTimer);
-    timer->start(10);
+    timer->start(20);
     QObject::connect(timer, &QTimer::timeout, this, &MainWindow::update);
 
     keyTable[Qt::Key_K] = 0;
