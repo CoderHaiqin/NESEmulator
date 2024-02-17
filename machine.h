@@ -5,20 +5,21 @@
 #include "ppu.h"
 #include "qrgb.h"
 #include "ioregister.h"
+#include "mapper.h"
 
 class Machine
 {
 private:
     CPU cpu;
     Bus bus;
+    ROM rom;
     MemoryBlock* ram;
-    MemoryBlock* prg1;
-    MemoryBlock* prg2;
+    MemoryBlock* extended_ram;
 
-    MemoryBlock* chr1;
-    MemoryBlock* chr2;
     PPU ppu;
     PPUBus ppuBus;
+
+    Mapper* mapper;
 
     IORegister ioRegister;
     bool keyState[0x10];

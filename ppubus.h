@@ -1,13 +1,8 @@
 #ifndef PPUBUS_H
 #define PPUBUS_H
-#include "type.h"
-#include "memoryblock.h"
-
+#include "mapper.h"
 
 struct PPUMemory {
-    MemoryBlock* patternTable0;
-    MemoryBlock* patternTable1;
-
     u8 nameTable0[0x400];
     u8 nameTable1[0x400];
     u8 nameTable2[0x400];
@@ -20,6 +15,7 @@ struct PPUMemory {
 class PPUBus
 {
 private:
+    Mapper* mapper_;
     PPUMemory ppuMemory_;
 public:
     PPUBus();
@@ -27,7 +23,7 @@ public:
     void write(u16 addr, u8 value);
     u8 read(u16 addr);
 
-    void bindPatternTable(int index, MemoryBlock* memoryBlock);
+    void bindMapper(Mapper* mapper);
 };
 
 #endif // PPUBUS_H

@@ -44,6 +44,8 @@ bool ROM::load(const std::string& path) {
         p++;
     }
 
+    mapperType_ = ((header_[6] >> 4) & 0xf) | (header_[7] & 0xf0);
+
     return true;
 }
 

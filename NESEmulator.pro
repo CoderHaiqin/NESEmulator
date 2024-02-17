@@ -17,13 +17,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     ioregister.cpp \
-    memoryblock.cpp \
+    mapper.cpp \
+    mappernrom.cpp \
     bus.cpp \
     cpu.cpp \
     instr.cpp \
     machine.cpp \
     main.cpp \
     mainwindow.cpp \
+    mapperuxrom.cpp \
     ppu.cpp \
     ppubus.cpp \
     registers.cpp \
@@ -31,13 +33,15 @@ SOURCES += \
 
 HEADERS += \
     ioregister.h \
-    memoryblock.h \
+    mapper.h \
+    mappernrom.h \
     bus.h \
     constant.h \
     cpu.h \
     instr.h \
     machine.h \
     mainwindow.h \
+    mapperuxrom.h \
     ppu.h \
     ppubus.h \
     registers.h \

@@ -12,6 +12,8 @@ public:
     std::vector<u8> CHR_;
     std::vector<u8> M_;
 
+    u8 mapperType_;
+
     ROM();
     bool load(const std::string& path);
 

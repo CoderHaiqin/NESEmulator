@@ -11,14 +11,10 @@ void PPUBus::write(u16 addr, u8 value) {
         lastaddr.pop_front();
     }
     // qDebug() << "PPU write: " << Qt::hex << Qt::showbase << addr << " " << value << Qt::endl;
-    if(addr < 0x1000) {
-        assert(0);
-        ppuMemory_.patternTable0->write(addr, value);
-    } else if(addr < 0x2000) {
-        assert(0);
-        ppuMemory_.patternTable1->write(addr - 0x1000, value);
+    if(addr < 0x2000) {
+        // assert(0);
+        mapper_->writeCHR(addr, value);
     } else if (addr < 0x2400) {
-
         ppuMemory_.nameTable0[addr - 0x2000] = value;
     } else if (addr < 0x2800) {
         ppuMemory_.nameTable1[addr - 0x2400] = value;
@@ -40,12 +36,8 @@ void PPUBus::write(u16 addr, u8 value) {
 }
 
 u8 PPUBus::read(u16 addr) {
-    if(addr < 0x1000) {
-
-
-        return ppuMemory_.patternTable0->read(addr);
-    } else if(addr < 0x2000) {
-        return ppuMemory_.patternTable1->read(addr - 0x1000);
+    if(addr < 0x2000) {
+        return mapper_->readCHR(addr);
     } else if (addr < 0x2400) {
         return ppuMemory_.nameTable0[addr - 0x2000];
     } else if (addr < 0x2800) {
@@ -68,10 +60,6 @@ u8 PPUBus::read(u16 addr) {
     return 0;
 }
 
-void PPUBus::bindPatternTable(int index, MemoryBlock* memoryBlock) {
-    if(index == 0) {
-        ppuMemory_.patternTable0 = memoryBlock;
-    } else if (index == 1) {
-        ppuMemory_.patternTable1 = memoryBlock;
-    }
+void PPUBus::bindMapper(Mapper *mapper) {
+    mapper_ = mapper;
 }
