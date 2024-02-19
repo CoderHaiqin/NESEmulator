@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     // machine.load("./m.nes");
     // machine.load("./c.nes");
     // machine.load("./Castlevania.nes");
-     machine.load("./r.nes");
+    // machine.load("./r.nes");
 
 }
 

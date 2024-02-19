@@ -32,7 +32,7 @@ private:
 
     QGraphicsScene* scene_game;
     QGraphicsPixmapItem *pixmap_lp;
-    QRgb pixels[Constant::screenWidth * Constant::screenHeight];
+    QRgb pixels[256 * 256];
 
 private slots:
     void update();

@@ -27,3 +27,7 @@ Mapper* Mapper::createFromROM(ROM *rom) {
     }
     return result;
 }
+
+u8 Mapper::getNameTableMirror() {
+    return rom->getNameTableMirror();
+}

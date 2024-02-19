@@ -3,10 +3,13 @@
 #include "mapper.h"
 
 struct PPUMemory {
-    u8 nameTable0[0x400];
-    u8 nameTable1[0x400];
-    u8 nameTable2[0x400];
-    u8 nameTable3[0x400];
+    u8 nameTable[0x4 * 0x400];
+
+    u8 nameTable0 = 0;
+    u8 nameTable1 = 0;
+    u8 nameTable2 = 0;
+    u8 nameTable3 = 0;
+
 
     u8 PaletteRAMIndex[0x20];
 

@@ -57,11 +57,11 @@ bool ROM::hasTrainerArea() {
     return header_[6] & 0x04;
 }
 
-u16 ROM::getPRGSize() {
+u32 ROM::getPRGSize() {
     return header_[4] * 1024 * 16;
 }
 
-u16 ROM::getCHRSize() {
+u32 ROM::getCHRSize() {
     return header_[5] * 1024 * 8;
 }
 
@@ -71,4 +71,12 @@ u8 ROM::getFlag6() {
 
 u8 ROM::getFlag7() {
     return header_[7];
+}
+
+u8 ROM::getNameTableMirror() {
+    if(header_[6] & 0x8) {
+        return 2;
+    } else {
+        return header_[6] & 0x1;
+    }
 }

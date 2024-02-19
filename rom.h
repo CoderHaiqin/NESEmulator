@@ -19,10 +19,12 @@ public:
 
     bool check();
     bool hasTrainerArea();
-    u16 getPRGSize();
-    u16 getCHRSize();
+    u32 getPRGSize();
+    u32 getCHRSize();
     u8 getFlag6();
     u8 getFlag7();
+
+    u8 getNameTableMirror();
 };
 
 #endif // ROM_H

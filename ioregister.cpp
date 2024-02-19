@@ -15,9 +15,7 @@ u8 IORegister::read(u16 addr) {
             result = keyState1 & 1;
             keyState1 >>= 1;
         }
-        if(result) {
-            int a = 0;
-        }
+
         return 0x40 | result;
     }
     return 0;

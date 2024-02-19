@@ -7,13 +7,13 @@
 class CPU;
 
 struct Control {
-    u8 N;
-    u8 I;
-    u8 S;
-    u8 B;
-    u8 H;
-    u8 P;
-    u8 V;
+    u8 N = 0;
+    u8 I = 0;
+    u8 S = 0;
+    u8 B = 0;
+    u8 H = 0;
+    u8 P = 0;
+    u8 V = 0;
 
     void write(u8 value) {
         N = value & 0x3;
@@ -38,14 +38,14 @@ struct Control {
 };
 
 struct Mask {
-    u8 Grey;
-    u8 m;
-    u8 M;
-    u8 b;
-    u8 s;
-    u8 R;
-    u8 G;
-    u8 B;
+    u8 Grey = 0;
+    u8 m = 0;
+    u8 M = 0;
+    u8 b = 0;
+    u8 s = 0;
+    u8 R = 0;
+    u8 G = 0;
+    u8 B = 0;
 
     void write(u8 value) {
         Grey = value & 0x1;
@@ -72,9 +72,9 @@ struct Mask {
 };
 
 struct Status {
-    u8 V;
-    u8 S;
-    u8 O;
+    u8 V = 0;
+    u8 S = 0;
+    u8 O = 0;
     void write(u8 value) {
         V = (value >> 7) & 0x1;
         S = (value >> 6) & 0x1;
@@ -117,8 +117,9 @@ private:
 
 public:
     PPU();
+//    std::vector<u8> line;
     u8 screen[Constant::screenHeight][Constant::screenWidth][Constant::colorChannel];
-    u8 chrScreen[128][128][3];
+    u8 chrScreen[256][256][3];
 
     u8 ppuram[0x100];
 
@@ -148,9 +149,8 @@ public:
     void startVBlank();
     void endVBlank();
 
-//    void get();
-
-//    void getCHR();
+    void getCHR();
+    void get();
 
     void execute();
 

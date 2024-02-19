@@ -5,6 +5,9 @@
 class MapperUxROM : public Mapper
 {
 public:
+    MemoryBlock ramForCHR;
+    bool useRAMforCHR;
+    u16 PRGPosition_;
     MapperUxROM(ROM* rom);
 
     u8 readPRG(u16 address) override;
