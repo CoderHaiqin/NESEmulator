@@ -69,8 +69,8 @@ void PPUBus::bindMapper(Mapper *mapper) {
 
     u8 mirror = mapper_->getNameTableMirror();
     static u16 m[3][4] = {
-        {0, 0x400, 0, 0x400},
         {0, 0, 0x800, 0x800},
+        {0, 0x400, 0, 0x400},
         {0, 0x400, 0x800, 0xc00},
     };
 

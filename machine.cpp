@@ -51,7 +51,7 @@ void Machine::load(const std::string& path) {
 void Machine::update() {
     for (int i = 0; i < 29781; ++i) //per frame
     {
-//        ppu.execute();
+        ppu.execute();
         ppu.execute();
         ppu.execute();
         cpu.execute();
@@ -60,12 +60,18 @@ void Machine::update() {
 }
 
 void Machine::get(QRgb* pixels) {
+//    ppu.getNameTable();
+//    for(int i = 0; i < 240 * 2; i++) {
+//        for(int j = 0; j < 256 * 2; j++) {
+//            pixels[256*2 * i + j] = qRgb(ppu.nameTableScreen[i][j][0], ppu.nameTableScreen[i][j][1], ppu.nameTableScreen[i][j][2]);
+//            // pixels[256 * i + j] = qRgb(ppu.chrScreen[i][j][0], ppu.chrScreen[i][j][1], ppu.chrScreen[i][j][2]);
+
+//        }
+//    }
 //    ppu.get();
     for(int i = 0; i < 240; i++) {
         for(int j = 0; j < 256; j++) {
             pixels[256 * i + j] = qRgb(ppu.screen[i][j][0], ppu.screen[i][j][1], ppu.screen[i][j][2]);
-            //pixels[256 * i + j] = qRgb(ppu.chrScreen[i][j][0], ppu.chrScreen[i][j][1], ppu.chrScreen[i][j][2]);
-
         }
     }
 }

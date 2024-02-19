@@ -27,9 +27,9 @@ MainWindow::MainWindow(QWidget *parent)
     // machine.load("./nestest.nes");
     // machine.load("./color_test.nes");
     // machine.load("./m.nes");
-    // machine.load("./c.nes");
+     machine.load("./c.nes");
     // machine.load("./Castlevania.nes");
-     machine.load("./r.nes");
+    // machine.load("./r.nes");
 
 }
 
@@ -44,7 +44,7 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     this->machine.get(this->pixels);
     QImage img((uchar*)pixels, Constant::screenWidth, Constant::screenHeight, QImage::Format_ARGB32);
 
-    // QImage img((uchar*)pixels, 128, 128, QImage::Format_ARGB32);
+    //QImage img((uchar*)pixels, 128, 128, QImage::Format_ARGB32);
     img = img.scaled(Constant::screenWidth * 2, Constant::screenHeight * 2);
     p.drawImage(0, 0, img);
 }

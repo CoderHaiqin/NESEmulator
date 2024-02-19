@@ -5,10 +5,10 @@
 struct PPUMemory {
     u8 nameTable[0x4 * 0x400];
 
-    u8 nameTable0 = 0;
-    u8 nameTable1 = 0;
-    u8 nameTable2 = 0;
-    u8 nameTable3 = 0;
+    u16 nameTable0 = 0;
+    u16 nameTable1 = 0;
+    u16 nameTable2 = 0;
+    u16 nameTable3 = 0;
 
 
     u8 PaletteRAMIndex[0x20];
@@ -19,8 +19,8 @@ class PPUBus
 {
 private:
     Mapper* mapper_;
-    PPUMemory ppuMemory_;
 public:
+    PPUMemory ppuMemory_;
     PPUBus();
 
     void write(u16 addr, u8 value);

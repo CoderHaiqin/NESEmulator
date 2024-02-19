@@ -119,7 +119,8 @@ public:
     PPU();
 //    std::vector<u8> line;
     u8 screen[Constant::screenHeight][Constant::screenWidth][Constant::colorChannel];
-    u8 chrScreen[256][256][3];
+    //u8 chrScreen[256][256][3];
+    u8 nameTableScreen[Constant::screenHeight*2][Constant::screenWidth*2][Constant::colorChannel];
 
     u8 ppuram[0x100];
 
@@ -149,6 +150,7 @@ public:
     void startVBlank();
     void endVBlank();
 
+    void getNameTable();
     void getCHR();
     void get();
 
