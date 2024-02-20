@@ -66,17 +66,18 @@ u8 PPUBus::read(u16 addr) {
 
 void PPUBus::bindMapper(Mapper *mapper) {
     mapper_ = mapper;
+}
 
+void PPUBus::updateMirror() {
     u8 mirror = mapper_->getNameTableMirror();
     static u16 m[3][4] = {
         {0, 0, 0x800, 0x800},
         {0, 0x400, 0, 0x400},
         {0, 0x400, 0x800, 0xc00},
-    };
+        };
 
     ppuMemory_.nameTable0 = m[mirror][0];
     ppuMemory_.nameTable1 = m[mirror][1];
     ppuMemory_.nameTable2 = m[mirror][2];
     ppuMemory_.nameTable3 = m[mirror][3];
-
 }

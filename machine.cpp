@@ -43,7 +43,9 @@ void Machine::load(const std::string& path) {
 
     mapper = Mapper::createFromROM(&rom);
     bus.bindMapper(mapper);
+    mapper->bindPPUBus(&ppuBus);
     ppuBus.bindMapper(mapper);
+    ppuBus.updateMirror();
 
     reset();
 }

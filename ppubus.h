@@ -27,6 +27,7 @@ public:
     u8 read(u16 addr);
 
     void bindMapper(Mapper* mapper);
+    void updateMirror();
 };
 
 #endif // PPUBUS_H

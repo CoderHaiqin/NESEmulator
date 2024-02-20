@@ -35,3 +35,7 @@ Mapper* Mapper::createFromROM(ROM *rom) {
 u8 Mapper::getNameTableMirror() {
     return rom->getNameTableMirror();
 }
+
+void Mapper::bindPPUBus(PPUBus *ppuBus) {
+    this->ppuBus = ppuBus;
+}
