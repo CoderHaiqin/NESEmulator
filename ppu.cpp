@@ -335,10 +335,9 @@ void PPU::render() {
             paletteAddr = bgColor;
         }
 
+
         u8 paletteIndex = ppuBus_->read(0x3f00 + paletteAddr);
-        if(y % 2 == 0 && paletteAddr != 0) {
-            int a = 0;
-        }
+
 
         this->screen[y][x][0] = Constant::palette[paletteIndex][0];
         this->screen[y][x][1] = Constant::palette[paletteIndex][1];

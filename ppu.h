@@ -95,7 +95,6 @@ private:
     Control control_;
     Mask mask_;
     Status status_;
-    u8 OAMAddr_ = 0;
     // u8 OAMData_;
 
     u8 w_register_ = 1;
@@ -104,7 +103,6 @@ private:
     u16 addr_tmp_ = 0;
     u16 addr_ = 0;
     u16 data_buffer = 0;
-    u8 OAMDMA_ = 0;
 
     PPUBus* ppuBus_ = nullptr;
     CPU* cpu_;
@@ -124,6 +122,7 @@ public:
 
     u8 ppuram[0x100];
 
+    u8 OAMAddr_ = 0;
     void bindPPUBus(PPUBus* ppuBus);
     void bindCPU(CPU* cpu);
 

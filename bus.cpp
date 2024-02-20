@@ -58,8 +58,11 @@ void Bus::write(u16 address, u8 value) {
         // TODO
         pageAddr = pageAddr & 0x7ff;
         cpu_->oamCycle();
-        for(int i = 0; i < 0xff; i++) {
-            ppu_->ppuram[i] = (*ram_)[pageAddr + i];
+//        if(ppu_->OAMAddr_ != 0) {
+//            int a = 0;
+//        }
+        for(int i = 0; i < 0x100; i++) {
+            ppu_->ppuram[(ppu_->OAMAddr_ + i) % 0x100] = (*ram_)[pageAddr + i];
         }
 
     }

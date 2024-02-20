@@ -84,4 +84,5 @@ void CPU::nmi() {
 
 void CPU::oamCycle() {
     cycle_ += 513 + clockCount_ & 1;
+//    cycle_ += 512 + clockCount_ & 1;
 }

@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     ioregister.cpp \
     mapper.cpp \
+    mappermmc1.cpp \
     mappernrom.cpp \
     bus.cpp \
     cpu.cpp \
@@ -34,6 +35,7 @@ SOURCES += \
 HEADERS += \
     ioregister.h \
     mapper.h \
+    mappermmc1.h \
     mappernrom.h \
     bus.h \
     constant.h \

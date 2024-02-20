@@ -26,8 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // machine.load("./nestest.nes");
     // machine.load("./color_test.nes");
-    // machine.load("./m.nes");
-     machine.load("./c.nes");
+     machine.load("./m.nes");
+    // machine.load("./c.nes");
     // machine.load("./Castlevania.nes");
     // machine.load("./r.nes");
 
